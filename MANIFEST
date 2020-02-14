@@ -1,4 +1,5 @@
 src/app.d
+src/gamewindow.d
 
 dub.sdl
 st.sh
