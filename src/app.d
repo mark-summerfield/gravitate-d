@@ -1,9 +1,11 @@
 #!/usr/bin/env dub
 // Copyright © 2020 Mark Summerfield. All rights reserved.
-import gtk.Main: Main;
-import gtk.MainWindow: MainWindow;
-import gtk.Widget: Widget;
-import std.stdio;
+import gdk.Event;
+import gtk.Button;
+import gtk.Main;
+import gtk.MainWindow;
+import gtk.Widget;
+import std.stdio: writeln;
 
 void main(string[] args) {
     Main.init(args);
@@ -11,12 +13,21 @@ void main(string[] args) {
     Main.run();
 }
 
-private class GameWindow : MainWindow {
+private final class GameWindow : MainWindow {
     this() {
         super("Gravitate");
         // TODO
+        auto newButton = new Button("New");
+        newButton.addOnClicked(delegate void(Button b) { onNew(); });
+        
+        add(newButton);
+
         addOnDestroy(&quit);
         showAll();
+    }
+
+    void onNew() {
+        writeln("onNew");
     }
 
     void quit(Widget widget) {
