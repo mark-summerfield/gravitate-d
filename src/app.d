@@ -5,6 +5,6 @@ import gtk.Main;
 
 void main(string[] args) {
     Main.init(args);
-    auto game = new GameWindow();
+    new GameWindow();
     Main.run();
 }

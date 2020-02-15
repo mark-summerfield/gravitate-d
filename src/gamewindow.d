@@ -12,7 +12,7 @@ final class GameWindow : MainWindow {
         super("Gravitate");
         // TODO
         auto newButton = new Button("New");
-        newButton.addOnClicked(delegate void(Button b) { onNew(); });
+        newButton.addOnClicked(delegate void(Button) { onNew(); });
         
         add(newButton);
 
@@ -24,7 +24,7 @@ final class GameWindow : MainWindow {
         writeln("onNew");
     }
 
-    void quit(Widget widget) {
+    void quit(Widget) {
         Main.quit();
     }
 }
