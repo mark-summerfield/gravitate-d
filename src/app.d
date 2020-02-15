@@ -1,10 +1,15 @@
 #!/usr/bin/env dub
 // Copyright © 2020 Mark Summerfield. All rights reserved.
 import gamewindow: GameWindow;
-import gtk.Main;
+import gio.Application: GioApplication = Application;
+import gtk.Application: Application;
+import gtk.ApplicationWindow: GApplicationFlags;
 
-void main(string[] args) {
-    Main.init(args);
-    new GameWindow();
-    Main.run();
+int main(string[] args) {
+    auto application = new Application("eu.qtrac.gravitate",
+                                       GApplicationFlags.FLAGS_NONE);
+    application.addOnActivate(delegate void(GioApplication) {
+        new GameWindow(application);
+    });
+    return application.run(args);
 }
