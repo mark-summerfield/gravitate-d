@@ -15,13 +15,14 @@ final class GameWindow: ApplicationWindow {
         setTitle("Gravitate");
         // make widgets
         auto newButton = new Button("New");
-        newButton.addOnClicked(delegate void(Button) { onNew(); });
         
         // make layout
         add(newButton);
 
         // make bindings
         addOnDestroy(&quit);
+        newButton.addOnClicked(delegate void(Button) { onNew(); });
+
         setSizeRequest(400, 400); // TODO load/save last size/pos
         showAll();
     }
