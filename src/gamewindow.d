@@ -3,11 +3,11 @@
 
 import gtk.Application: Application;
 import gtk.ApplicationWindow: ApplicationWindow;
-import gtk.Widget;
+import gtk.Widget: Widget;
 
 final class GameWindow: ApplicationWindow {
     this(Application application) {
-        import gtk.Button;
+        import gtk.Button: Button;
 
         super(application);
 
@@ -33,7 +33,7 @@ final class GameWindow: ApplicationWindow {
     }
 
     void quit(Widget) {
-        import gtk.Main;
+        import gtk.Main: Main;
 
         Main.quit();
     }
