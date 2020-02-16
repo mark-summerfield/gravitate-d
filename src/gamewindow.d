@@ -31,7 +31,7 @@ final class GameWindow: ApplicationWindow {
         // make bindings
         newButton.addOnClicked(delegate void(Button) { onNew(); });
         aboutButton.addOnClicked(delegate void(Button) { onAbout(); });
-        quitButton.addOnClicked(delegate void(Button) { onQuit(null); });
+        quitButton.addOnClicked(delegate void(Button) { close(); });
         addOnDestroy(&onQuit);
 
         setSizeRequest(400, 400); // TODO load size/pos
