@@ -1,5 +1,5 @@
 name "gravitate"
-description "A samegame/tilefall-like game"
+description "A SameGame/TileFall-like game"
 authors "Mark Summerfield"
 copyright "Copyright © 2020 Mark Summerfield. All rights reserved."
 homepage "https://www.qtrac.eu/gravitate.html"

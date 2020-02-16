@@ -10,7 +10,6 @@ int main(string[] args) {
                                        GApplicationFlags.FLAGS_NONE);
     application.addOnActivate(delegate void(GioApplication) {
         import gamewindow: GameWindow;
-
         new GameWindow(application);
     });
     return application.run(args);
