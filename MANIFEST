@@ -1,5 +1,7 @@
 src/app.d
 src/gamewindow.d
+src/aboutbox.d
+src/common.d
 
 dub.sdl
 st.sh

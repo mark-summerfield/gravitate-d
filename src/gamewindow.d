@@ -1,28 +1,40 @@
-#!/usr/bin/env dub
 // Copyright © 2020 Mark Summerfield. All rights reserved.
 
+import common: APPNAME, ICON;
 import gtk.Application: Application;
 import gtk.ApplicationWindow: ApplicationWindow;
 import gtk.Widget: Widget;
 
 final class GameWindow: ApplicationWindow {
     this(Application application) {
+        import gtk.Box : Box;
         import gtk.Button: Button;
+        import gtkc.gtktypes : GtkOrientation;
 
         super(application);
 
-        setTitle("Gravitate");
+        setTitle(APPNAME);
+        setIconFromFile(ICON); // TODO embed
+
         // make widgets
-        auto newButton = new Button("New");
+        auto newButton = new Button("_New");
+        auto aboutButton = new Button("_About");
+        auto quitButton = new Button("_Quit");
         
         // make layout
-        add(newButton);
+        auto hbox = new Box(GtkOrientation.HORIZONTAL, 5);
+        hbox.packStart(newButton, false, false, 5);
+        hbox.packStart(aboutButton, false, false, 5);
+        hbox.packEnd(quitButton, false, false, 5);
+        add(hbox);
 
         // make bindings
-        addOnDestroy(&quit);
         newButton.addOnClicked(delegate void(Button) { onNew(); });
+        aboutButton.addOnClicked(delegate void(Button) { onAbout(); });
+        quitButton.addOnClicked(delegate void(Button) { onQuit(null); });
+        addOnDestroy(&onQuit);
 
-        setSizeRequest(400, 400); // TODO load/save last size/pos
+        setSizeRequest(400, 400); // TODO load size/pos
         showAll();
     }
 
@@ -32,9 +44,17 @@ final class GameWindow: ApplicationWindow {
         writeln("onNew");
     }
 
-    void quit(Widget) {
-        import gtk.Main: Main;
+    void onAbout() {
+        import aboutbox: about;
 
-        Main.quit();
+        about(this);
+    }
+
+    void onQuit(Widget) {
+        import std.stdio: writeln;
+
+        writeln("onQuit: save size/pos");
+
+        destroy();
     }
 }
