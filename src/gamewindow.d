@@ -27,15 +27,14 @@ final class GameWindow: ApplicationWindow {
         makeLayout();
         makeBindings();
 
+        // TODO load size/pos (with default fallbacks)
         int width = 400;
         int height = 400;
         setSizeRequest(width, height);
-        getSize(width, height);
-import std.stdio: writefln; writefln("this: load size/pos/hiscore %sx%s",
-width, height);
-        board.setSizeRequest(width, height - 40);
-
         showAll();
+// TODO make board occupy all available space
+        getSize(width, height);
+        board.setSizeRequest(width, height - 40);
     }
 
     void makeWidgets() {
