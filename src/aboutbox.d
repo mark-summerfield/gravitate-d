@@ -4,7 +4,7 @@ import gamewindow: GameWindow;
 
 void about(GameWindow window) {
     import common: APPNAME, VERSION, ICON;
-    import std.compiler: dname = name, version_major, version_minor;
+    import std.compiler: compiler = name, version_major, version_minor;
     import std.conv: to;
     import std.datetime.systime: Clock;
     import std.format: format;
@@ -26,8 +26,8 @@ void about(GameWindow window) {
     dialog.setComments(
         "A SameGame/TileFall-like game.\n\n" ~
         format("Written in D with GtkD %s.%s using %s %s.%s on %s.\n",
-               Version.getMajorVersion(), Version.getMinorVersion(), dname,
-               version_major, version_minor, os));
+               Version.getMajorVersion(), Version.getMinorVersion(),
+               compiler, version_major, version_minor, os));
     dialog.setCopyright(
         format("Copyright © %s Mark Summerfield. All rights reserved.",
                 year));

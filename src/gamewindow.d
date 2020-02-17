@@ -43,14 +43,15 @@ final class GameWindow: ApplicationWindow {
         helpButton = new Button(StockID.HELP);
         aboutButton = new Button(StockID.ABOUT);
         quitButton = new Button(StockID.QUIT);
+        foreach (button; [newButton, optionsButton, helpButton, aboutButton,
+                          quitButton])
+            button.setAlwaysShowImage(true);
         board = new Board();
         statusLabel = new Label("0/0");
     }
 
     void makeLayout() {
         import gtk.Box : Box;
-        import gtk.Grid : Grid;
-        import gtk.Separator : Separator;
         import gtkc.gtktypes : GtkOrientation;
 
         enum pad = 5;

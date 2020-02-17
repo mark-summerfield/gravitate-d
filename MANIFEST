@@ -8,3 +8,6 @@ src/common.d
 
 dub.sdl
 st.sh
+
+~/app/gravitate/nim/MANIFEST
+~/app/gravitate/jv/MANIFEST
