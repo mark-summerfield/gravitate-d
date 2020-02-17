@@ -8,7 +8,6 @@ final class GameWindow: ApplicationWindow {
     import gtk.Button: Button;
     import gtk.Label: Label;
     import gtk.Widget: Widget;
-    import gtkc.gtktypes : GtkAllocation;
 
     private Button newButton;
     private Button optionsButton;
