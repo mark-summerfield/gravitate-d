@@ -54,17 +54,20 @@ final class GameWindow: ApplicationWindow {
         import gtkc.gtktypes : GtkOrientation;
 
         enum pad = 5;
+        enum Expand = true;
+        enum NoExpand = false;
+        enum Fill = true;
         auto hbox = new Box(GtkOrientation.HORIZONTAL, pad);
         hbox.setHomogeneous(true);
-        hbox.packStart(newButton, false, true, pad);
-        hbox.packStart(optionsButton, false, true, pad);
-        hbox.packStart(helpButton, false, true, pad);
-        hbox.packStart(aboutButton, false, true, pad);
-        hbox.packEnd(quitButton, false, true, pad);
+        hbox.packStart(newButton, NoExpand, Fill, pad);
+        hbox.packStart(optionsButton, NoExpand, Fill, pad);
+        hbox.packStart(helpButton, NoExpand, Fill, pad);
+        hbox.packStart(aboutButton, NoExpand, Fill, pad);
+        hbox.packEnd(quitButton, NoExpand, Fill, pad);
         auto vbox = new Box(GtkOrientation.VERTICAL, pad);
-        vbox.packStart(hbox, false, true, pad);
-        vbox.packStart(board, true, true, pad);
-        vbox.packEnd(statusLabel, false, true, pad);
+        vbox.packStart(hbox, NoExpand, Fill, pad);
+        vbox.packStart(board, Expand, Fill, pad);
+        vbox.packEnd(statusLabel, NoExpand, Fill, pad);
         add(vbox);
     }
 
