@@ -1,5 +1,3 @@
-# TODO SVG icons?
-
 src/app.d
 src/gamewindow.d
 src/board.d
@@ -11,3 +9,5 @@ st.sh
 
 ~/app/gravitate/nim/MANIFEST
 ~/app/gravitate/jv/MANIFEST
+
+# TODO SVG icons?
