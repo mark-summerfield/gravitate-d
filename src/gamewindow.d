@@ -8,6 +8,7 @@ final class GameWindow: ApplicationWindow {
     import gtk.Button: Button;
     import gtk.Label: Label;
     import gtk.Widget: Widget;
+    import gtkc.gtktypes : GtkAllocation;
 
     private Button newButton;
     private Button optionsButton;
@@ -22,19 +23,15 @@ final class GameWindow: ApplicationWindow {
 
         super(application);
         setTitle(APPNAME);
-        setIconFromFile(ICON); // TODO embed
+        setIconFromFile(ICON); // TODO embed or SVG
         makeWidgets();
         makeLayout();
         makeBindings();
-
         // TODO load size/pos (with default fallbacks)
-        int width = 400;
-        int height = 400;
-        setSizeRequest(width, height);
+        const width = 400;
+        const height = 400;
+        setDefaultSize(width, height);
         showAll();
-// TODO make board occupy all available space
-        getSize(width, height);
-        board.setSizeRequest(width, height - 40);
     }
 
     void makeWidgets() {
@@ -46,13 +43,13 @@ final class GameWindow: ApplicationWindow {
         helpButton = new Button(StockID.HELP);
         aboutButton = new Button(StockID.ABOUT);
         quitButton = new Button(StockID.QUIT);
-        // TODO get the board size based on window size
         board = new Board();
         statusLabel = new Label("0/0");
     }
 
     void makeLayout() {
         import gtk.Box : Box;
+        import gtk.Grid : Grid;
         import gtk.Separator : Separator;
         import gtkc.gtktypes : GtkOrientation;
 
@@ -72,34 +69,33 @@ final class GameWindow: ApplicationWindow {
     }
 
     void makeBindings() {
-        newButton.addOnClicked(delegate void(Button) { onNew(); });
-        optionsButton.addOnClicked(delegate void(Button) { onOptions(); });
-        helpButton.addOnClicked(delegate void(Button) { onHelp(); });
-        aboutButton.addOnClicked(delegate void(Button) { onAbout(); });
+        newButton.addOnClicked(&onNew);
+        optionsButton.addOnClicked(&onOptions);
+        helpButton.addOnClicked(&onHelp);
+        aboutButton.addOnClicked(&onAbout);
         quitButton.addOnClicked(delegate void(Button) { close(); });
         addOnDestroy(&onQuit);
     }
 
-    void onNew() {
-        import std.stdio: writeln; writeln("onNew");
+    void onNew(Button) {
+        import std.stdio: writeln; writeln("onNew"); // TODO
     }
 
-    void onOptions() {
-        import std.stdio: writeln; writeln("onOptions");
+    void onOptions(Button) {
+        import std.stdio: writeln; writeln("onOptions"); // TODO
     }
 
-    void onHelp() {
-        import std.stdio: writeln; writeln("onHelp");
+    void onHelp(Button) {
+        import std.stdio: writeln; writeln("onHelp"); // TODO
     }
 
-    void onAbout() {
+    void onAbout(Button) {
         import aboutbox: about;
         about(this);
     }
 
     void onQuit(Widget) {
-        import std.stdio: writeln; writeln("onQuit: save size/pos");
-
+        import std.stdio: writeln; writeln("onQuit: save size/pos"); // TODO
         destroy();
     }
 }

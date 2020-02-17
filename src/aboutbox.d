@@ -20,7 +20,7 @@ void about(GameWindow window) {
     scope(exit) dialog.destroy();
     dialog.setProgramName(APPNAME);
     dialog.setVersion(VERSION);
-    auto icon = new Pixbuf(ICON); // TODO embed
+    auto icon = new Pixbuf(ICON); // TODO embed or SVG
     dialog.setLogo(icon);
     dialog.setAuthors(["Mark Summerfield"]);
     dialog.setComments(
