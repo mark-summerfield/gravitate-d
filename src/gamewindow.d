@@ -27,10 +27,11 @@ final class GameWindow: ApplicationWindow {
         makeLayout();
         makeBindings();
         // TODO load size/pos (with default fallbacks)
-        const width = 400;
-        const height = 400;
+        immutable width = 400;
+        immutable height = 400;
         setDefaultSize(width, height);
         showAll();
+        polishLayout();
     }
 
     void makeWidgets() {
@@ -53,22 +54,31 @@ final class GameWindow: ApplicationWindow {
         import gtk.Box : Box;
         import gtkc.gtktypes : GtkOrientation;
 
-        enum pad = 5;
+        enum pad = 1;
         enum Expand = true;
         enum NoExpand = false;
         enum Fill = true;
+        enum NoFill = false;
+        auto leftBox = new Box(GtkOrientation.HORIZONTAL, pad);
+        leftBox.setHomogeneous(true);
+        leftBox.packStart(newButton, NoExpand, Fill, pad);
+        leftBox.packStart(optionsButton, NoExpand, Fill, pad);
+        leftBox.packStart(helpButton, NoExpand, Fill, pad);
+        leftBox.packStart(aboutButton, NoExpand, Fill, pad);
         auto hbox = new Box(GtkOrientation.HORIZONTAL, pad);
-        hbox.setHomogeneous(true);
-        hbox.packStart(newButton, NoExpand, Fill, pad);
-        hbox.packStart(optionsButton, NoExpand, Fill, pad);
-        hbox.packStart(helpButton, NoExpand, Fill, pad);
-        hbox.packStart(aboutButton, NoExpand, Fill, pad);
+        hbox.packStart(leftBox, NoExpand, NoFill, pad);
         hbox.packEnd(quitButton, NoExpand, Fill, pad);
         auto vbox = new Box(GtkOrientation.VERTICAL, pad);
         vbox.packStart(hbox, NoExpand, Fill, pad);
         vbox.packStart(board, Expand, Fill, pad);
         vbox.packEnd(statusLabel, NoExpand, Fill, pad);
         add(vbox);
+    }
+
+    void polishLayout() {
+        immutable width = newButton.getAllocatedWidth();
+        immutable height = newButton.getAllocatedHeight();
+        quitButton.setSizeRequest(width, height);
     }
 
     void makeBindings() {

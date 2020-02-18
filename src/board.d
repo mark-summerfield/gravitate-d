@@ -7,11 +7,15 @@ final class Board: DrawingArea {
     import common: ACTIVE_BG_COLOR;
     import gtk.Widget: Widget;
     import options: Options;
+    import point: Point;
 
     enum State { PLAYING, GAME_OVER, USER_WON }
     enum Direction { UP, DOWN, LEFT, RIGHT }
-    private enum UNSELECTED = -1;
+
     private auto options = Options();
+    private auto state = State.PLAYING;
+    private int score = 0;
+    private auto selected = Point();
 
     this() {
         setSizeRequest(150, 150); // Minimum size

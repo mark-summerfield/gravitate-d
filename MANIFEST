@@ -3,6 +3,7 @@ src/gamewindow.d
 src/board.d
 src/aboutbox.d
 src/options.d
+src/point.d
 src/common.d
 
 dub.sdl
