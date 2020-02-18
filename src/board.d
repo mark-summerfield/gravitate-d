@@ -6,6 +6,12 @@ final class Board: DrawingArea {
     import cairo.Context: Context, Scoped;
     import common: ACTIVE_BG_COLOR;
     import gtk.Widget: Widget;
+    import options: Options;
+
+    enum State { PLAYING, GAME_OVER, USER_WON }
+    enum Direction { UP, DOWN, LEFT, RIGHT }
+    private enum UNSELECTED = -1;
+    private auto options = Options();
 
     this() {
         setSizeRequest(150, 150); // Minimum size
@@ -22,6 +28,14 @@ final class Board: DrawingArea {
         // TODO
 
         return true;
+    }
+
+    void newGame() {
+        import std.random: Random, uniform, unpredictableSeed;
+
+        auto rnd = Random(unpredictableSeed);
+
+        // TODO
     }
 
     // TODO mouse & keyboard & game logic

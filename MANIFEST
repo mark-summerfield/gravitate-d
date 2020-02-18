@@ -2,6 +2,7 @@ src/app.d
 src/gamewindow.d
 src/board.d
 src/aboutbox.d
+src/options.d
 src/common.d
 
 dub.sdl
