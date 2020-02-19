@@ -121,7 +121,7 @@ final class GameWindow : ApplicationWindow {
 
     void onChangeScore(int score, Board.State state) {
         // TODO
-        import std.stdio;
+        import std.stdio: writefln;
         writefln("onChangeScore %s %s", score, state);
     }
 }

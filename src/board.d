@@ -7,7 +7,7 @@ alias Size = Tuple!(int, "width", int, "height");
 
 final class Board : DrawingArea {
     import cairo.Context: Context, Scoped;
-    import color: ACTIVE_BG_COLOR, Color;
+    import color: Color;
     import gtk.Widget: Widget;
     import options: Options;
     import point: Point;
@@ -40,7 +40,8 @@ final class Board : DrawingArea {
         score = 0;
         selected = Point();
         auto rnd = Random(unpredictableSeed);
-        auto colors = GAME_COLORS.randomSample(options.maxColors, rnd);
+        auto colors = GAME_COLORS.byKey.array.randomSample(
+            options.maxColors, rnd);
         tiles = new Color[][](options.columns, options.rows);
         for (int x = 0; x < options.columns; x++) {
             for (int y = 0; y < options.rows; y++) {
@@ -68,6 +69,8 @@ final class Board : DrawingArea {
         import std.conv: to;
         import std.math: round;
 
+        context.save();
+        scope(exit) context.restore();
         immutable size = tileSize();
         immutable edge = round(min(size.width, size.height) / 9).to!int;
         for (int x = 0; x < options.columns; x++)
@@ -90,7 +93,7 @@ final class Board : DrawingArea {
         immutable color = tiles[x][y];
         if (!color.isValid()) {
             context.rectangle(x1, y1, size.width, size.height);
-            context.setSourceRgb(ACTIVE_BG_COLOR.toRgb.expand);
+            context.setSourceRgb(Color.ACTIVE_BG.toRgb.expand);
             context.fill();
         } else {
             import cairo.Pattern: Pattern;
@@ -108,23 +111,29 @@ final class Board : DrawingArea {
                               size.height - edge2);
             context.setSource(gradient);
             context.fill();
-            // TODO
+            if (selected.x == x && selected.y == y)
+                drawFocus(context, x1, y1, size);
         }
     }
 
     private Color.Pair colorPair(Color color) {
-        auto lighten = 0.5;
-        auto darken = -0.5;
+        import color: GAME_COLORS;
+
+        auto plight = color in GAME_COLORS;
+        Color light = plight is null ? Color.ACTIVE_BG : *plight;
+        auto dark = color;
         if (state != State.PLAYING) {
-            lighten = 0.25;
-            darken = -0.75;
+            light = light.morphed(Color.DARKEN);
+            dark = dark.morphed(Color.DARKEN);
         }
-        return Color.Pair(color.morphed(lighten), color.morphed(darken));
+        return Color.Pair(light, dark);
     }
 
     private void drawSegments(ref Scoped!Context context, const int edge,
                               const Color.Pair colors, const int x1,
                               const int y1, const int x2, const int y2) {
+        context.save();
+        scope(exit) context.restore();
         drawSegment(context, colors.light, [x1, y1, x1 + edge, y1 + edge,
                     x2 - edge, y1 + edge, x2, y1]); // top
         drawSegment(context, colors.light, [x1, y1, x1, y2, x1 + edge,
@@ -145,6 +154,22 @@ final class Board : DrawingArea {
         context.closePath();
         context.setSourceRgb(color.toRgb.expand);
         context.fill();
+    }
+
+    private void drawFocus(ref Scoped!Context context, const int x1,
+                           const int y1, const Size size) {
+        import std.algorithm: min;
+        import std.math: fmax, fmin;
+
+        context.save();
+        scope(exit) context.restore();
+        auto indent = fmax(2, min(size.width, size.height) / 8.0);
+        auto indent2 = indent * 2.5;
+        context.setDash([1.5], 0);
+        context.rectangle(x1 + indent, y1 + indent, size.width - indent2,
+                          size.height - indent2);
+        context.setSourceRgb(Color.ACTIVE_FOCUS_RECT.toRgb.expand);
+        context.stroke();
     }
 
     // TODO mouse & keyboard & game logic
