@@ -83,25 +83,68 @@ final class Board : DrawingArea {
 
     private void drawTile(ref Scoped!Context context, const int x,
                           const int y, const Size size, const int edge) {
-        immutable edge2 = edge * 2;
+        context.save();
+        scope(exit) context.restore();
         immutable x1 = x * size.width;
         immutable y1 = y * size.height;
         immutable color = tiles[x][y];
         if (!color.isValid()) {
             context.rectangle(x1, y1, size.width, size.height);
-            context.setSourceRgb(ACTIVE_BG_COLOR.asRgb.expand);
+            context.setSourceRgb(ACTIVE_BG_COLOR.toRgb.expand);
             context.fill();
         } else {
-            int x2 = x1 + size.width;
-            int y2 = y1 + size.height;
-            auto colors = colorPair(color);
+            import cairo.Pattern: Pattern;
+
+            immutable edge2 = edge * 2;
+            immutable x2 = x1 + size.width;
+            immutable y2 = y1 + size.height;
+            immutable colors = colorPair(color);
+            drawSegments(context, edge, colors, x1, y1, x2, y2);
+            auto gradient = Pattern.createLinear(x1, y1, size.width,
+                                                 size.height);
+            gradient.addColorStopRgb(0, colors.light.toRgb.expand);
+            gradient.addColorStopRgb(1, colors.dark.toRgb.expand);
+            context.rectangle(x1 + edge, y1 + edge, size.width - edge2,
+                              size.height - edge2);
+            context.setSource(gradient);
+            context.fill();
             // TODO
         }
     }
 
     private Color.Pair colorPair(Color color) {
-        int factor = state == State.PLAYING ? 40 : 65;
-        return Color.Pair(color.morphed(factor), color.morphed(-factor));
+        auto lighten = 0.5;
+        auto darken = -0.5;
+        if (state != State.PLAYING) {
+            lighten = 0.25;
+            darken = -0.75;
+        }
+        return Color.Pair(color.morphed(lighten), color.morphed(darken));
+    }
+
+    private void drawSegments(ref Scoped!Context context, const int edge,
+                              const Color.Pair colors, const int x1,
+                              const int y1, const int x2, const int y2) {
+        drawSegment(context, colors.light, [x1, y1, x1 + edge, y1 + edge,
+                    x2 - edge, y1 + edge, x2, y1]); // top
+        drawSegment(context, colors.light, [x1, y1, x1, y2, x1 + edge,
+                    y2 - edge, x1 + edge, y1 + edge]); // left
+        drawSegment(context, colors.dark, [x2 - edge, y1 + edge, x2, y1, x2,
+                    y2, x2 - edge, y2 - edge]); // right
+        drawSegment(context, colors.dark, [x1, y2, x1 + edge, y2 - edge,
+                    x2 - edge, y2 - edge, x2, y2]); // bottom
+    }
+
+    private void drawSegment(ref Scoped!Context context, const Color color,
+                             const int[] points) {
+        context.save();
+        scope(exit) context.restore();
+        context.moveTo(points[0], points[1]);
+        for (int i = 2; i < points.length; i += 2)
+            context.lineTo(points[i], points[i + 1]);
+        context.closePath();
+        context.setSourceRgb(color.toRgb.expand);
+        context.fill();
     }
 
     // TODO mouse & keyboard & game logic
