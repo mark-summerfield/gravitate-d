@@ -17,6 +17,7 @@ final class GameWindow : ApplicationWindow {
     private ToolButton quitButton;
     private Board board;
     private Label statusLabel;
+    private bool terminating;
 
     this(Application application) {
         import common: APPNAME, ICON;
@@ -59,10 +60,8 @@ final class GameWindow : ApplicationWindow {
         import gtkc.gtktypes: GtkOrientation;
 
         enum pad = 1;
-        enum Expand = true;
-        enum NoExpand = false;
-        enum Fill = true;
-        enum NoFill = false;
+        enum: bool {Expand = true, Fill = true,
+                    NoExpand = false, NoFill = false}
         auto leftBox = new Box(GtkOrientation.HORIZONTAL, pad);
         leftBox.setHomogeneous(true);
         leftBox.packStart(newButton, NoExpand, Fill, pad);
@@ -88,6 +87,32 @@ final class GameWindow : ApplicationWindow {
         addOnDestroy(&onQuit);
     }
 
+    bool onKeyPress(Event event, Widget) {
+        import gdk.Keymap : Keymap;
+
+        uint kv;
+        event.getKeyval(kv);
+        switch (Keymap.keyvalName(kv)) {
+        case "n", "N":
+            onNew(null);
+            return true;
+        case "o", "O":
+            onOptions(null);
+            return true;
+        case "h", "H", "F1":
+            onHelp(null);
+            return true;
+        case "a", "A":
+            onAbout(null);
+            return true;
+        case "q", "Q", "Escape":
+            onQuit(null);
+            return true;
+        default:
+            return false;
+        }
+    }
+
     void onNew(ToolButton) {
         import std.stdio: writeln;
         writeln("onNew"); // TODO
@@ -109,8 +134,10 @@ final class GameWindow : ApplicationWindow {
     }
 
     void onQuit(Widget) {
-        import std.stdio: writeln;
-        writeln("onQuit: save size/pos"); // TODO
+        if (terminating)
+            return;
+        terminating = true;
+        import std.stdio: writeln; writeln("onQuit: save size/pos"); // TODO
         destroy();
     }
 
@@ -118,39 +145,5 @@ final class GameWindow : ApplicationWindow {
         // TODO
         import std.stdio: writefln;
         writefln("onChangeScore %s %s", score, state);
-    }
-
-    bool onKeyPress(Event event, Widget) {
-        import std.conv: to;
-        import gdk.Keymap: Keymap;
-
-        // FIXME surely there's a nicer way!
-        ushort kc;
-        event.getKeycode(kc);
-        version(Windows) {
-            immutable help = 112;
-            immutable esc = 27;
-        }
-        version(Posix) {
-            immutable help = 67;
-            immutable esc = 9;
-        }
-        if (kc == help) {
-            onHelp(null);
-            return true;
-        } else if (kc == esc) {
-            onQuit(null);
-            return true;
-        }
-        uint kv;
-        event.getKeyval(kv);
-        switch (Keymap.keyvalToUnicode(kv)) {
-            case 'n'.to!uint: onNew(null); return true;
-            case 'o'.to!uint: onOptions(null); return true;
-            case 'h'.to!uint: onHelp(null); return true;
-            case 'a'.to!uint: onAbout(null); return true;
-            case 'q'.to!uint: onQuit(null); return true;
-            default: return false;
-        }
     }
 }

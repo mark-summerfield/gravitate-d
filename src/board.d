@@ -3,8 +3,6 @@
 import gtk.DrawingArea: DrawingArea;
 import std.typecons: Tuple;
 
-alias Size = Tuple!(int, "width", int, "height");
-
 final class Board : DrawingArea {
     import cairo.Context: Context, Scoped;
     import color: Color;
@@ -16,14 +14,17 @@ final class Board : DrawingArea {
 
     enum Direction { UP, DOWN, LEFT, RIGHT }
 
-    private void delegate(int, State) onChangeState;
+    private alias Size = Tuple!(int, "width", int, "height");
+    private alias OnChangeStateFn = void delegate(int, State);
+
+    private OnChangeStateFn onChangeState;
     private auto options = Options();
     private State state;
     private int score;
     private Point selected;
     private Color[][] tiles;
 
-    this(void delegate(int, State) onChangeState) {
+    this(OnChangeStateFn onChangeState) {
         this.onChangeState = onChangeState;
         setSizeRequest(150, 150); // Minimum size
         addOnDraw(&onDraw);
@@ -111,7 +112,7 @@ final class Board : DrawingArea {
     private Color.Pair colorPair(Color color) {
         import color: GAME_COLORS;
 
-        auto plight = color in GAME_COLORS;
+        immutable plight = color in GAME_COLORS;
         Color light = plight is null ? Color.ACTIVE_BG : *plight;
         auto dark = color;
         if (state != State.PLAYING) {
@@ -136,6 +137,7 @@ final class Board : DrawingArea {
 
     private void drawSegment(ref Scoped!Context context, const Color color,
                              const int[] points) {
+        context.newPath();
         context.moveTo(points[0], points[1]);
         for (int i = 2; i < points.length; i += 2)
             context.lineTo(points[i], points[i + 1]);
@@ -149,8 +151,8 @@ final class Board : DrawingArea {
         import std.algorithm: min;
         import std.math: fmax, fmin;
 
-        auto indent = fmax(2, min(size.width, size.height) / 8.0);
-        auto indent2 = indent * 2.5;
+        immutable indent = fmax(2, min(size.width, size.height) / 8.0);
+        immutable indent2 = indent * 2.5;
         context.setDash([1.5], 0);
         context.rectangle(x1 + indent, y1 + indent, size.width - indent2,
                           size.height - indent2);

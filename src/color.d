@@ -10,28 +10,26 @@ struct Color {
     enum INACTIVE_BG = Color(0xF0, 0xF0, 0xF0);
     enum ACTIVE_FOCUS_RECT = Color(0xF, 0xF, 0xF); // almost black
     enum INACTIVE_FOCUS_RECT = Color(0x7F, 0x7F, 0x7F); // gray
-    enum INVALID = Color.invalid();
+    enum INVALID = -1;
     enum DARKEN = -0.5;
     enum LIGHTEN = 0.5;
 
-    private int red;
-    private int green;
-    private int blue;
-
-    static Color invalid() {
-        return Color(-1, -1, -1);
-    }
+    private int red = INVALID;
+    private int green = INVALID;
+    private int blue = INVALID;
 
     bool isValid() const {
-        return red >= 0 && green >= 0 && blue >= 0;
+        return red > INVALID && green > INVALID && blue > INVALID;
     }
 
     Rgb toRgb() const {
+        assert(isValid());
         return Rgb(red / 255.0, green / 255.0, blue / 255.0);
     }
 
     /// luminosity: lighten = (0.0 1.0]; darken = (0.0 -1.0]
     Color morphed(double luminosity) const {
+        assert(isValid());
         import std.conv: to;
         import std.math: fmax, fmin, round;
 
