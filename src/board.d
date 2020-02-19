@@ -103,8 +103,7 @@ final class Board : DrawingArea {
             immutable y2 = y1 + size.height;
             immutable colors = colorPair(color);
             drawSegments(context, edge, colors, x1, y1, x2, y2);
-            auto gradient = Pattern.createLinear(x1, y1, size.width,
-                                                 size.height);
+            auto gradient = Pattern.createLinear(x1, y1, x2, y2);
             gradient.addColorStopRgb(0, colors.light.toRgb.expand);
             gradient.addColorStopRgb(1, colors.dark.toRgb.expand);
             context.rectangle(x1 + edge, y1 + edge, size.width - edge2,
