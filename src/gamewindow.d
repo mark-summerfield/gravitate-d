@@ -35,11 +35,13 @@ final class GameWindow: ApplicationWindow {
     }
 
     void makeWidgets() {
+        import gtk.Image: Image;
         import gtkc.gtktypes : StockID;
 
         newButton = new Button(StockID.NEW);
-        // TODO keep the preferences icon but change the text to "_Options"
-        optionsButton = new Button(StockID.PREFERENCES);
+        optionsButton = new Button("_Options");
+        // Supposed to work but doesn't
+        optionsButton.setImage(new Image(StockID.PREFERENCES));
         helpButton = new Button(StockID.HELP);
         aboutButton = new Button(StockID.ABOUT);
         quitButton = new Button(StockID.QUIT);
