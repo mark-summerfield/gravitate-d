@@ -6,7 +6,7 @@ struct Point {
     int x = INVALID;
     int y = INVALID;
 
-    bool isValid() {
+    bool isValid() const {
         return x != INVALID && y != INVALID;
     }
 }

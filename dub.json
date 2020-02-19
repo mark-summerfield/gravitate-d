@@ -1,12 +1,11 @@
 {
+	"name": "gravitate",
+	"authors": [ "Mark Summerfield" ],
 	"description": "A SameGame/TileFall-like game",
+	"copyright": "Copyright © 2020 Mark Summerfield. All rights reserved.",
+	"targetType": "executable",
 	"homepage": "https://www.qtrac.eu/gravitate.html",
 	"license": "Apache-2.0",
-	"name": "gravitate",
-	"targetType": "executable",
-	"authors": [
-		"Mark Summerfield"
-	],
 	"buildTypes": {
 		"release": {
 			"lflags-windows": [
@@ -15,7 +14,6 @@
 			]
 		}
 	},
-	"copyright": "Copyright © 2020 Mark Summerfield. All rights reserved.",
 	"dependencies": {
 		"gtk-d:gtkd": "~>3.9.0"
 	}

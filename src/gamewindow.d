@@ -2,7 +2,7 @@
 
 import gtk.ApplicationWindow: ApplicationWindow;
 
-final class GameWindow: ApplicationWindow {
+final class GameWindow : ApplicationWindow {
     import board: Board;
     import gtk.Application: Application;
     import gtk.Button: Button;
@@ -35,26 +35,27 @@ final class GameWindow: ApplicationWindow {
     }
 
     void makeWidgets() {
+        import gtk.IconSize: IconSize;
         import gtk.Image: Image;
-        import gtkc.gtktypes : StockID;
+        import gtkc.gtktypes: StockID;
 
         newButton = new Button(StockID.NEW);
         optionsButton = new Button("_Options");
-        // Supposed to work but doesn't
-        optionsButton.setImage(new Image(StockID.PREFERENCES));
+        optionsButton.setImage(new Image(StockID.PREFERENCES,
+                                         IconSize.fromName("BUTTON")));
         helpButton = new Button(StockID.HELP);
         aboutButton = new Button(StockID.ABOUT);
         quitButton = new Button(StockID.QUIT);
         foreach (button; [newButton, optionsButton, helpButton, aboutButton,
                           quitButton])
             button.setAlwaysShowImage(true);
-        board = new Board();
+        board = new Board(&onChangeScore);
         statusLabel = new Label("0/0");
     }
 
     void makeLayout() {
-        import gtk.Box : Box;
-        import gtkc.gtktypes : GtkOrientation;
+        import gtk.Box: Box;
+        import gtkc.gtktypes: GtkOrientation;
 
         enum pad = 1;
         enum Expand = true;
@@ -93,15 +94,18 @@ final class GameWindow: ApplicationWindow {
     }
 
     void onNew(Button) {
-        import std.stdio: writeln; writeln("onNew"); // TODO
+        import std.stdio: writeln;
+        writeln("onNew"); // TODO
     }
 
     void onOptions(Button) {
-        import std.stdio: writeln; writeln("onOptions"); // TODO
+        import std.stdio: writeln;
+        writeln("onOptions"); // TODO
     }
 
     void onHelp(Button) {
-        import std.stdio: writeln; writeln("onHelp"); // TODO
+        import std.stdio: writeln;
+        writeln("onHelp"); // TODO
     }
 
     void onAbout(Button) {
@@ -110,7 +114,14 @@ final class GameWindow: ApplicationWindow {
     }
 
     void onQuit(Widget) {
-        import std.stdio: writeln; writeln("onQuit: save size/pos"); // TODO
+        import std.stdio: writeln;
+        writeln("onQuit: save size/pos"); // TODO
         destroy();
+    }
+
+    void onChangeScore(int score, Board.State state) {
+        // TODO
+        import std.stdio;
+        writefln("onChangeScore %s %s", score, state);
     }
 }

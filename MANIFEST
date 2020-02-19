@@ -4,6 +4,7 @@ src/board.d
 src/aboutbox.d
 src/options.d
 src/point.d
+src/color.d
 src/common.d
 
 dub.sdl
