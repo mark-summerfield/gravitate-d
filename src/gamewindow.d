@@ -4,16 +4,17 @@ import gtk.ApplicationWindow: ApplicationWindow;
 
 final class GameWindow : ApplicationWindow {
     import board: Board;
+    import gdk.Event: Event;
     import gtk.Application: Application;
-    import gtk.Button: Button;
     import gtk.Label: Label;
+    import gtk.ToolButton: ToolButton;
     import gtk.Widget: Widget;
 
-    private Button newButton;
-    private Button optionsButton;
-    private Button helpButton;
-    private Button aboutButton;
-    private Button quitButton;
+    private ToolButton newButton;
+    private ToolButton optionsButton;
+    private ToolButton helpButton;
+    private ToolButton aboutButton;
+    private ToolButton quitButton;
     private Board board;
     private Label statusLabel;
 
@@ -26,12 +27,12 @@ final class GameWindow : ApplicationWindow {
         makeWidgets();
         makeLayout();
         makeBindings();
+        addOnKeyPress(&onKeyPress);
         // TODO load size/pos (with default fallbacks)
         immutable width = 400;
         immutable height = 400;
         setDefaultSize(width, height);
         showAll();
-        polishLayout();
     }
 
     void makeWidgets() {
@@ -39,16 +40,16 @@ final class GameWindow : ApplicationWindow {
         import gtk.Image: Image;
         import gtkc.gtktypes: StockID;
 
-        newButton = new Button(StockID.NEW);
-        optionsButton = new Button("_Options");
-        optionsButton.setImage(new Image(StockID.PREFERENCES,
-                                         IconSize.fromName("BUTTON")));
-        helpButton = new Button(StockID.HELP);
-        aboutButton = new Button(StockID.ABOUT);
-        quitButton = new Button(StockID.QUIT);
-        foreach (button; [newButton, optionsButton, helpButton, aboutButton,
-                          quitButton])
-            button.setAlwaysShowImage(true);
+        newButton = new ToolButton(StockID.NEW);
+        newButton.setTooltipMarkup("New <b>n</b>");
+        optionsButton = new ToolButton(StockID.PREFERENCES);
+        optionsButton.setTooltipMarkup("Options <b>o</b>");
+        helpButton = new ToolButton(StockID.HELP);
+        helpButton.setTooltipMarkup("Help <b>h</b> <i>or</i> <b>F1</b>");
+        aboutButton = new ToolButton(StockID.ABOUT);
+        aboutButton.setTooltipMarkup("About <b>a</b>");
+        quitButton = new ToolButton(StockID.QUIT);
+        quitButton.setTooltipMarkup("Quit <b>q</b> <i>or</i> <b>Esc</b>");
         board = new Board(&onChangeScore);
         statusLabel = new Label("0/0");
     }
@@ -78,37 +79,31 @@ final class GameWindow : ApplicationWindow {
         add(vbox);
     }
 
-    void polishLayout() {
-        immutable width = newButton.getAllocatedWidth();
-        immutable height = newButton.getAllocatedHeight();
-        quitButton.setSizeRequest(width, height);
-    }
-
     void makeBindings() {
         newButton.addOnClicked(&onNew);
         optionsButton.addOnClicked(&onOptions);
         helpButton.addOnClicked(&onHelp);
         aboutButton.addOnClicked(&onAbout);
-        quitButton.addOnClicked(delegate void(Button) { close(); });
+        quitButton.addOnClicked(delegate void(ToolButton) { close(); });
         addOnDestroy(&onQuit);
     }
 
-    void onNew(Button) {
+    void onNew(ToolButton) {
         import std.stdio: writeln;
         writeln("onNew"); // TODO
     }
 
-    void onOptions(Button) {
+    void onOptions(ToolButton) {
         import std.stdio: writeln;
         writeln("onOptions"); // TODO
     }
 
-    void onHelp(Button) {
+    void onHelp(ToolButton) {
         import std.stdio: writeln;
         writeln("onHelp"); // TODO
     }
 
-    void onAbout(Button) {
+    void onAbout(ToolButton) {
         import aboutbox: about;
         about(this);
     }
@@ -123,5 +118,39 @@ final class GameWindow : ApplicationWindow {
         // TODO
         import std.stdio: writefln;
         writefln("onChangeScore %s %s", score, state);
+    }
+
+    bool onKeyPress(Event event, Widget) {
+        import std.conv: to;
+        import gdk.Keymap: Keymap;
+
+        // FIXME surely there's a nicer way!
+        ushort kc;
+        event.getKeycode(kc);
+        version(Windows) {
+            immutable help = 112;
+            immutable esc = 27;
+        }
+        version(Posix) {
+            immutable help = 67;
+            immutable esc = 9;
+        }
+        if (kc == help) {
+            onHelp(null);
+            return true;
+        } else if (kc == esc) {
+            onQuit(null);
+            return true;
+        }
+        uint kv;
+        event.getKeyval(kv);
+        switch (Keymap.keyvalToUnicode(kv)) {
+            case 'n'.to!uint: onNew(null); return true;
+            case 'o'.to!uint: onOptions(null); return true;
+            case 'h'.to!uint: onHelp(null); return true;
+            case 'a'.to!uint: onAbout(null); return true;
+            case 'q'.to!uint: onQuit(null); return true;
+            default: return false;
+        }
     }
 }

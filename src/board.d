@@ -55,11 +55,8 @@ final class Board : DrawingArea {
     private void doDraw(int delayMs = 0) {
         if (delayMs > 0) {
             import glib.Timeout: Timeout;
-
             new Timeout(delayMs, delegate bool() {
-                queueDraw();
-                return false;
-            }, false);
+                queueDraw(); return false; }, false);
         } else
             queueDraw();
     }
@@ -69,8 +66,6 @@ final class Board : DrawingArea {
         import std.conv: to;
         import std.math: round;
 
-        context.save();
-        scope(exit) context.restore();
         immutable size = tileSize();
         immutable edge = round(min(size.width, size.height) / 9).to!int;
         for (int x = 0; x < options.columns; x++)
@@ -86,8 +81,6 @@ final class Board : DrawingArea {
 
     private void drawTile(ref Scoped!Context context, const int x,
                           const int y, const Size size, const int edge) {
-        context.save();
-        scope(exit) context.restore();
         immutable x1 = x * size.width;
         immutable y1 = y * size.height;
         immutable color = tiles[x][y];
@@ -131,8 +124,6 @@ final class Board : DrawingArea {
     private void drawSegments(ref Scoped!Context context, const int edge,
                               const Color.Pair colors, const int x1,
                               const int y1, const int x2, const int y2) {
-        context.save();
-        scope(exit) context.restore();
         drawSegment(context, colors.light, [x1, y1, x1 + edge, y1 + edge,
                     x2 - edge, y1 + edge, x2, y1]); // top
         drawSegment(context, colors.light, [x1, y1, x1, y2, x1 + edge,
@@ -145,8 +136,6 @@ final class Board : DrawingArea {
 
     private void drawSegment(ref Scoped!Context context, const Color color,
                              const int[] points) {
-        context.save();
-        scope(exit) context.restore();
         context.moveTo(points[0], points[1]);
         for (int i = 2; i < points.length; i += 2)
             context.lineTo(points[i], points[i + 1]);
@@ -160,8 +149,6 @@ final class Board : DrawingArea {
         import std.algorithm: min;
         import std.math: fmax, fmin;
 
-        context.save();
-        scope(exit) context.restore();
         auto indent = fmax(2, min(size.width, size.height) / 8.0);
         auto indent2 = indent * 2.5;
         context.setDash([1.5], 0);
