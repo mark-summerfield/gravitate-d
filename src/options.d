@@ -5,7 +5,7 @@ struct Options {
     int columns = 9;
     int rows = 9;
     int maxColors = 4;
-    int delayMs = 200;
+    int delayMs = 250;
 
     // TODO save(), copy(), ==, hash(), toString()
 }

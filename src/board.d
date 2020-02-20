@@ -10,6 +10,7 @@ final class Board : DrawingArea {
     import gtk.Widget: Widget;
     import options: Options;
     import point: Point;
+    import std.container.rbtree: RedBlackTree;
 
     enum Direction { UP, DOWN, LEFT, RIGHT }
     enum State { PLAYING, GAME_OVER, USER_WON }
@@ -17,6 +18,7 @@ final class Board : DrawingArea {
     private {
         alias Size = Tuple!(int, "width", int, "height");
         alias OnChangeStateFn = void delegate(int, State);
+        alias PointSet = RedBlackTree!Point;
 
         OnChangeStateFn onChangeState;
         auto options = Options();
@@ -32,7 +34,7 @@ final class Board : DrawingArea {
         addOnDraw(&onDraw);
         addOnButtonPress(&onMouseButtonPress);
         setRedrawOnAllocate(true);
-        newGame();
+        newGame;
     }
 
     void newGame() {
@@ -49,8 +51,8 @@ final class Board : DrawingArea {
             options.maxColors, rnd);
         tiles = new Color[][](options.columns, options.rows);
         each!(t => tiles[t[0]][t[1]] = colors.array.choice(rnd))
-             (allTilesRange());
-        doDraw();
+             (allTilesRange);
+        doDraw;
         onChangeState(score, state);
     }
 
@@ -64,9 +66,9 @@ final class Board : DrawingArea {
         if (delayMs > 0) {
             import glib.Timeout: Timeout;
             new Timeout(delayMs, delegate bool() {
-                queueDraw(); return false; }, false);
+                queueDraw; return false; }, false);
         } else
-            queueDraw();
+            queueDraw;
     }
 
     private bool onDraw(Scoped!Context context, Widget) {
@@ -74,16 +76,16 @@ final class Board : DrawingArea {
         import std.conv: to;
         import std.math: round;
 
-        immutable size = tileSize();
+        immutable size = tileSize;
         immutable edge = round(min(size.width, size.height) / 9).to!int;
         each!(t => drawTile(context, t[0], t[1], size, edge))
-             (allTilesRange());
+             (allTilesRange);
         return true;
     }
 
     private Size tileSize() {
-        return Size(getAllocatedWidth() / options.columns,
-                    getAllocatedHeight() / options.rows);
+        return Size(getAllocatedWidth / options.columns,
+                    getAllocatedHeight / options.rows);
     }
 
     private void drawTile(ref Scoped!Context context, const int x,
@@ -91,10 +93,10 @@ final class Board : DrawingArea {
         immutable x1 = x * size.width;
         immutable y1 = y * size.height;
         immutable color = tiles[x][y];
-        if (!color.isValid()) {
+        if (!color.isValid) {
             context.rectangle(x1, y1, size.width, size.height);
             context.setSourceRgb(Color.BACKGROUND.toRgb.expand);
-            context.fill();
+            context.fill;
         } else {
             import cairo.Pattern: Pattern;
 
@@ -109,7 +111,7 @@ final class Board : DrawingArea {
             context.rectangle(x1 + edge, y1 + edge, size.width - edge2,
                               size.height - edge2);
             context.setSource(gradient);
-            context.fill();
+            context.fill;
             if (selected.x == x && selected.y == y)
                 drawFocus(context, x1, y1, size);
         }
@@ -122,8 +124,8 @@ final class Board : DrawingArea {
         Color light = plight is null ? Color.BACKGROUND : *plight;
         auto dark = color;
         if (state != State.PLAYING) {
-            light = light.morphed(Color.DARKEN);
-            dark = dark.morphed(Color.DARKEN);
+            light = light.darker;
+            dark = dark.darker;
         }
         return Color.Pair(light, dark);
     }
@@ -143,13 +145,13 @@ final class Board : DrawingArea {
 
     private void drawSegment(ref Scoped!Context context, const Color color,
                              const int[] points) {
-        context.newPath();
+        context.newPath;
         context.moveTo(points[0], points[1]);
         for (int i = 2; i < points.length; i += 2)
             context.lineTo(points[i], points[i + 1]);
-        context.closePath();
+        context.closePath;
         context.setSourceRgb(color.toRgb.expand);
-        context.fill();
+        context.fill;
     }
 
     private void drawFocus(ref Scoped!Context context, const int x1,
@@ -163,7 +165,7 @@ final class Board : DrawingArea {
         context.rectangle(x1 + indent, y1 + indent, size.width - indent2,
                           size.height - indent2);
         context.setSourceRgb(Color.FOCUS_RECT.toRgb.expand);
-        context.stroke();
+        context.stroke;
     }
 
     private bool onMouseButtonPress(Event event, Widget) {
@@ -171,13 +173,13 @@ final class Board : DrawingArea {
             import std.conv: to;
             import std.math: floor;
 
-            auto size = tileSize();
+            auto size = tileSize;
             double eventX;
             double eventY;
             event.getCoords(eventX, eventY);
             immutable x = floor(eventX / size.width).to!int;
             immutable y = floor(eventY / size.height).to!int;
-            selected.clear();
+            selected.clear;
             deleteTiles(Point(x, y));
         }
         return true;
@@ -186,7 +188,7 @@ final class Board : DrawingArea {
     void navigate(Direction direction) {
         if (state != State.PLAYING)
             return;
-        if (!selected.isValid()) {
+        if (!selected.isValid) {
             selected.x = options.columns / 2;
             selected.y = options.rows / 2;
         } else {
@@ -199,25 +201,29 @@ final class Board : DrawingArea {
             case Direction.DOWN: y++; break;
             }
             if (0 <= x && x < options.columns && 0 <= y && y < options.rows
-                    && tiles[x][y].isValid()) {
+                    && tiles[x][y].isValid) {
                 selected.x = x;
                 selected.y = y;
             }
         }
-        doDraw();
+        doDraw;
     }
 
     void chooseTile() {
-        if (state != State.PLAYING || !selected.isValid())
+        if (state != State.PLAYING || !selected.isValid)
             return;
         deleteTiles(selected);
     }
 
     private void deleteTiles(Point p) {
+        import glib.Timeout: Timeout;
+
         auto color = tiles[p.x][p.y];
-        if (!color.isValid() || !isLegal(p, color))
+        if (!color.isValid || !isLegal(p, color))
             return;
-        // TODO
+        auto adjoining = dimAdjoining(p, color);
+        new Timeout(options.delayMs, delegate bool() {
+            deleteAdjoining(adjoining); return false; }, false);
     }
 
     private bool isLegal(Point p, Color color) {
@@ -232,5 +238,40 @@ final class Board : DrawingArea {
         if (y + 1 < options.rows && color == tiles[x][y + 1])
             return true;
         return false;
+    }
+
+    private PointSet dimAdjoining(Point p, Color color) {
+        import std.algorithm: each;
+
+        auto adjoining = new PointSet;
+        populateAdjoining(p, color, adjoining);
+        each!(ap => tiles[ap.x][ap.y] = tiles[ap.x][ap.y].darker)
+             (adjoining);
+        doDraw(options.delayMs);
+        return adjoining;
+    }
+
+    private void populateAdjoining(Point p, Color color,
+                                   ref PointSet adjoining) {
+        immutable x = p.x;
+        immutable y = p.y;
+        if (!(0 <= x && x < options.columns && 0 <= y && y < options.rows))
+            return; // Fallen off an edge
+        if (p in adjoining || tiles[x][y] != color)
+            return; // Color doesn't match or already done
+        adjoining.insert(p);
+        populateAdjoining(Point(x - 1, y), color, adjoining);
+        populateAdjoining(Point(x + 1, y), color, adjoining);
+        populateAdjoining(Point(x, y - 1), color, adjoining);
+        populateAdjoining(Point(x, y + 1), color, adjoining);
+    }
+
+    private void deleteAdjoining(PointSet adjoining) {
+        import std.algorithm: each;
+
+        auto invalid = Color();
+        each!(ap => tiles[ap.x][ap.y] = invalid)(adjoining);
+        doDraw(options.delayMs);
+        // TODO
     }
 }

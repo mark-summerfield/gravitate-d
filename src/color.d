@@ -9,7 +9,6 @@ struct Color {
     enum BACKGROUND = Color(0xFF, 0xFE, 0xE0);
     enum FOCUS_RECT = Color(0xF, 0xF, 0xF); // almost black
 
-
     private {
         enum INVALID = -1;
 
@@ -27,11 +26,16 @@ struct Color {
         return Rgb(red / 255.0, green / 255.0, blue / 255.0);
     }
 
-    enum DARKEN = -0.5;
-    enum LIGHTEN = 0.5;
+    Color darker(double luminosity=0.2) const {
+        return morphed(-luminosity);
+    }
+
+    Color lighter(double luminosity=0.5) const {
+        return morphed(luminosity);
+    }
 
     // luminosity: lighten = (0.0 1.0]; darken = (0.0 -1.0]
-    Color morphed(double luminosity) const {
+    private Color morphed(double luminosity) const {
         assert(isValid());
         import std.conv: to;
         import std.math: fmax, fmin, round;
@@ -45,8 +49,9 @@ struct Color {
         return Color(r, g, b);
     }
 
-    size_t toHash() const @safe pure nothrow {
-        return red ^ green ^ blue;
+    size_t toHash() const @safe nothrow {
+        return typeid(red).getHash(&red) ^ typeid(green).getHash(&green) ^
+               typeid(blue).getHash(&blue);
     }
 
     bool opEquals(const Color other) const @safe pure nothrow {

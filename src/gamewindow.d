@@ -27,15 +27,15 @@ final class GameWindow : ApplicationWindow {
         super(application);
         setTitle(APPNAME);
         setIconFromFile(ICON); // TODO embed or SVG
-        makeWidgets();
-        makeLayout();
-        makeBindings();
+        makeWidgets;
+        makeLayout;
+        makeBindings;
         addOnKeyPress(&onKeyPress);
         // TODO load size/pos (with default fallbacks)
         immutable width = 400;
         immutable height = 400;
         setDefaultSize(width, height);
-        showAll();
+        showAll;
     }
 
     private void makeWidgets() {
@@ -85,7 +85,7 @@ final class GameWindow : ApplicationWindow {
         optionsButton.addOnClicked(&onOptions);
         helpButton.addOnClicked(&onHelp);
         aboutButton.addOnClicked(&onAbout);
-        quitButton.addOnClicked(delegate void(ToolButton) { close(); });
+        quitButton.addOnClicked(delegate void(ToolButton) { close; });
         addOnDestroy(&onQuit);
     }
 
@@ -123,7 +123,7 @@ final class GameWindow : ApplicationWindow {
             board.navigate(Board.Direction.DOWN);
             return true;
         case "space":
-            board.chooseTile();
+            board.chooseTile;
             return true;
         default:
             return false;
@@ -155,7 +155,7 @@ final class GameWindow : ApplicationWindow {
             return;
         terminating = true;
         import std.stdio: writeln; writeln("onQuit: save size/pos"); // TODO
-        destroy();
+        destroy;
     }
 
     private void onChangeScore(int score, Board.State state) {

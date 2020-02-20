@@ -14,4 +14,16 @@ struct Point {
         x = INVALID;
         y = INVALID;
     }
+
+    size_t toHash() const @safe nothrow {
+        return typeid(x).getHash(&x) ^ typeid(y).getHash(&y);
+    }
+
+    bool opEquals(const Point other) const @safe pure nothrow {
+        return x == other.x && y == other.y;
+    }
+
+    int opCmp(ref const Point other) const {
+        return (x == other.x) ? y - other.y : x - other.x;
+    }
 }

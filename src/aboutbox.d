@@ -13,11 +13,11 @@ void about(GameWindow window) {
     import gtk.AboutDialog: AboutDialog;
     import gtk.Version: Version;
 
-    auto thisYear = Clock.currTime().year;
+    auto thisYear = Clock.currTime.year;
     auto year = thisYear == 2020 ? thisYear.to!string
                                  : format("2020-%d", thisYear - 2000);
-    auto about = new AboutDialog();
-    scope (exit) about.destroy();
+    auto about = new AboutDialog;
+    scope (exit) about.destroy;
     about.setProgramName(APPNAME);
     about.setVersion(VERSION);
     auto icon = new Pixbuf(ICON); // TODO embed or SVG
@@ -26,7 +26,7 @@ void about(GameWindow window) {
     about.setComments(
         "A SameGame/TileFall-like game.\n\n" ~ format(
         "Written in D with GtkD %s.%s using %s %s.%s on %s.\n",
-        Version.getMajorVersion(), Version.getMinorVersion(),
+        Version.getMajorVersion, Version.getMinorVersion,
         compiler, version_major, version_minor, os));
     about.setCopyright(format(
         "Copyright © %s Mark Summerfield. All rights reserved.", year));
@@ -34,5 +34,5 @@ void about(GameWindow window) {
     about.setWebsite("https://www.qtrac.eu/gravitate.html");
     about.setWebsiteLabel("www.qtrac.eu/gravitate.html");
     about.setTransientFor(window);
-    about.run();
+    about.run;
 }
