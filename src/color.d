@@ -7,7 +7,7 @@ struct Color {
     alias Pair = Tuple!(Color, "light", Color, "dark");
 
     enum BACKGROUND = Color(0xFF, 0xFE, 0xE0);
-    enum FOCUS_RECT = Color(0xF, 0xF, 0xF); // almost black
+    enum FOCUS_RECT = Color(0xF, 0xF, 0xF);
 
     private {
         enum INVALID = -1;
@@ -26,10 +26,12 @@ struct Color {
         return Rgb(red / 255.0, green / 255.0, blue / 255.0);
     }
 
+    // least (0.0 1.0] most changed
     Color darker(double luminosity=0.2) const {
         return morphed(-luminosity);
     }
 
+    // least (0.0 1.0] most changed
     Color lighter(double luminosity=0.5) const {
         return morphed(luminosity);
     }

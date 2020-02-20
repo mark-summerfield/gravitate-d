@@ -7,7 +7,7 @@ src/point.d
 src/color.d
 src/common.d
 
-dub.sdl
+dub.json
 st.sh
 
 ~/app/gravitate/nim/MANIFEST

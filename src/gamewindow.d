@@ -89,6 +89,7 @@ final class GameWindow : ApplicationWindow {
         addOnDestroy(&onQuit);
     }
 
+    // These are application-global since we don't want a notion of focus
     private bool onKeyPress(Event event, Widget) {
         import gdk.Keymap : Keymap;
 

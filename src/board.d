@@ -19,6 +19,7 @@ final class Board : DrawingArea {
         alias Size = Tuple!(int, "width", int, "height");
         alias OnChangeStateFn = void delegate(int, State);
         alias PointSet = RedBlackTree!Point;
+        alias PointMap = Point[Point];
 
         OnChangeStateFn onChangeState;
         auto options = Options();
@@ -45,12 +46,12 @@ final class Board : DrawingArea {
 
         state = State.PLAYING;
         score = 0;
-        selected = Point();
+        selected.clear();
         auto rnd = Random(unpredictableSeed);
         auto colors = COLORS.byKey.array.randomSample(options.maxColors,
                                                       rnd);
         tiles = new Color[][](options.columns, options.rows);
-        each!(t => tiles[t[0]][t[1]] = colors.array.choice(rnd))
+        each!(xy => tiles[xy[0]][xy[1]] = colors.array.choice(rnd))
              (allTilesRange);
         doDraw;
         onChangeState(score, state);
@@ -62,7 +63,7 @@ final class Board : DrawingArea {
         return cartesianProduct(iota(options.columns), iota(options.rows));
     }
 
-    private void doDraw(int delayMs=0) {
+    private void doDraw(const int delayMs=0) {
         if (delayMs > 0) {
             import glib.Timeout: Timeout;
             new Timeout(delayMs, delegate bool() {
@@ -78,7 +79,7 @@ final class Board : DrawingArea {
 
         immutable size = tileSize;
         immutable edge = round(min(size.width, size.height) / 9).to!int;
-        each!(t => drawTile(context, t[0], t[1], size, edge))
+        each!(xy => drawTile(context, xy[0], xy[1], size, edge))
              (allTilesRange);
         return true;
     }
@@ -100,7 +101,6 @@ final class Board : DrawingArea {
         } else {
             import cairo.Pattern: Pattern;
 
-            immutable edge2 = edge * 2;
             immutable x2 = x1 + size.width;
             immutable y2 = y1 + size.height;
             immutable colors = colorPair(color);
@@ -108,6 +108,7 @@ final class Board : DrawingArea {
             auto gradient = Pattern.createLinear(x1, y1, x2, y2);
             gradient.addColorStopRgb(0, colors.light.toRgb.expand);
             gradient.addColorStopRgb(1, colors.dark.toRgb.expand);
+            immutable edge2 = edge * 2;
             context.rectangle(x1 + edge, y1 + edge, size.width - edge2,
                               size.height - edge2);
             context.setSource(gradient);
@@ -185,7 +186,7 @@ final class Board : DrawingArea {
         return true;
     }
 
-    void navigate(Direction direction) {
+    void navigate(const Direction direction) {
         if (state != State.PLAYING)
             return;
         if (!selected.isValid) {
@@ -210,23 +211,23 @@ final class Board : DrawingArea {
     }
 
     void chooseTile() {
-        if (state != State.PLAYING || !selected.isValid)
-            return;
-        deleteTiles(selected);
+        if (state == State.PLAYING && selected.isValid)
+            deleteTiles(selected);
     }
 
-    private void deleteTiles(Point p) {
+    private void deleteTiles(const Point p) {
         import glib.Timeout: Timeout;
 
         auto color = tiles[p.x][p.y];
         if (!color.isValid || !isLegal(p, color))
             return;
         auto adjoining = dimAdjoining(p, color);
+        doDraw;
         new Timeout(options.delayMs, delegate bool() {
             deleteAdjoining(adjoining); return false; }, false);
     }
 
-    private bool isLegal(Point p, Color color) {
+    private bool isLegal(const Point p, const Color color) {
         immutable x = p.x;
         immutable y = p.y;
         if (x > 0 && color == tiles[x - 1][y])
@@ -240,7 +241,7 @@ final class Board : DrawingArea {
         return false;
     }
 
-    private PointSet dimAdjoining(Point p, Color color) {
+    private PointSet dimAdjoining(const Point p, const Color color) {
         import std.algorithm: each;
 
         auto adjoining = new PointSet;
@@ -251,7 +252,7 @@ final class Board : DrawingArea {
         return adjoining;
     }
 
-    private void populateAdjoining(Point p, Color color,
+    private void populateAdjoining(const Point p, const Color color,
                                    ref PointSet adjoining) {
         immutable x = p.x;
         immutable y = p.y;
@@ -266,12 +267,57 @@ final class Board : DrawingArea {
         populateAdjoining(Point(x, y + 1), color, adjoining);
     }
 
-    private void deleteAdjoining(PointSet adjoining) {
+    private void deleteAdjoining(const PointSet adjoining) {
+        import glib.Timeout: Timeout;
         import std.algorithm: each;
 
         auto invalid = Color();
         each!(ap => tiles[ap.x][ap.y] = invalid)(adjoining);
         doDraw(options.delayMs);
+        new Timeout(options.delayMs, delegate bool() {
+            closeTilesUp(adjoining.length); return false; }, false);
+    }
+
+    private void closeTilesUp(const size_t count) {
+        moveTiles;
+        if (selected.isValid) {
+            if (!tiles[selected.x][selected.y].isValid) {
+                selected.x = options.columns / 2;
+                selected.y = options.rows / 2;
+            }
+        }
+        doDraw; // TODO delay?
+        // TODO calculate & report score: see nim
+        // TODO checkGameOver
+    }
+
+    private void moveTiles() {
+        bool moved = true;
+        PointMap moves;
+        while (moved) {
+            moved = false;
+            foreach (x; rippleRange(options.columns))
+                foreach (y; rippleRange(options.rows))
+                    if (tiles[x][y].isValid)
+                        if (moveIsPossible(x, y, moves)) {
+                            moved = true;
+                            break;
+                        }
+        }
+    }
+
+    private int[] rippleRange(const int limit) {
+        import std.array: array;
+        import std.range: iota;
+        import std.random: Random, randomShuffle, unpredictableSeed;
+
+        auto rnd = Random(unpredictableSeed);
+        return iota(limit).array.randomShuffle(rnd);
+    }
+
+    private bool moveIsPossible(const int x, const int y,
+                                ref PointMap moves) {
         // TODO
+        return false;
     }
 }
