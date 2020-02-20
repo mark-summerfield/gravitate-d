@@ -20,6 +20,7 @@ final class Board : DrawingArea {
         alias OnChangeStateFn = void delegate(int, State);
         alias PointSet = RedBlackTree!Point;
         alias PointMap = Point[Point];
+        alias MovePoint = Tuple!(bool, "move", Point, "point");
 
         OnChangeStateFn onChangeState;
         auto options = Options();
@@ -279,6 +280,9 @@ final class Board : DrawingArea {
     }
 
     private void closeTilesUp(const size_t count) {
+        import std.conv: to;
+        import std.math: pow, round, sqrt;
+
         moveTiles;
         if (selected.isValid) {
             if (!tiles[selected.x][selected.y].isValid) {
@@ -286,9 +290,11 @@ final class Board : DrawingArea {
                 selected.y = options.rows / 2;
             }
         }
-        doDraw; // TODO delay?
-        // TODO calculate & report score: see nim
-        // TODO checkGameOver
+        doDraw;
+        score += (round(sqrt(options.columns * options.rows.to!double)) +
+                  pow(count, options.maxColors / 2)).to!int;
+        checkGameOver;
+        onChangeState(score, state);
     }
 
     private void moveTiles() {
@@ -317,7 +323,79 @@ final class Board : DrawingArea {
 
     private bool moveIsPossible(const int x, const int y,
                                 ref PointMap moves) {
-        // TODO
+        import std.conv: to;
+        import std.math: fmax, round;
+
+        immutable p = Point(x, y);
+        auto empties = emptyNeighbours(x, y);
+        if (!empties.empty) {
+            immutable mp = nearestToMiddle(x, y, empties);
+            immutable np = mp.point;
+            auto seen = np in moves;
+            if (seen != null && *seen == p)
+                return false; // Avoid endless loop back and forth
+            if (mp.move) {
+                tiles[np.x][np.y] = tiles[x][y];
+                tiles[x][y] = Color(); // invalid color
+                moves[p] = np;
+                doDraw(round(fmax(1, options.delayMs / 3.0)).to!int);
+                return true;
+            }
+        }
         return false;
+    }
+
+    private PointSet emptyNeighbours(const int x, const int y) {
+        auto neighbours = new PointSet;
+        foreach (p; [Point(x - 1, y), Point(x + 1, y), Point(x, y - 1),
+                     Point(x, y + 1)])
+            if (0 <= p.x && p.x < options.columns && 0 <= p.y &&
+                    p.y < options.rows && !tiles[p.x][p.y].isValid)
+                neighbours.insert(p);
+        return neighbours;
+    }
+
+    private MovePoint nearestToMiddle(const int x, const int y,
+                                      const PointSet empties) {
+        import std.algorithm: minElement;
+        import std.container: heapify;
+        import std.math: hypot;
+
+        alias PriorityPoint = Tuple!(double, "priority", Point, "point");
+
+        immutable color = tiles[x][y];
+        immutable midx = options.columns / 2;
+        immutable midy = options.rows / 2;
+        immutable dold = hypot(midx - x, midy - y);
+        PriorityPoint[] ppoints;
+        foreach (p; empties)
+            if (isSquare(p)) {
+                auto dnew = hypot(midx - p.x, midy - p.y);
+                if (isLegal(p, color))
+                    dnew -= 0.1; // Make same colors slightly attractive
+                ppoints ~= PriorityPoint(dnew, p);
+            }
+        immutable pp = ppoints.minElement!(a => a.priority);
+        if (dold > pp.priority)
+            return MovePoint(true, pp.point);
+        return MovePoint(false, Point(x, y));
+    }
+
+    bool isSquare(const Point p) {
+        immutable x = p.x;
+        immutable y = p.y;
+        if (x > 0 && tiles[x - 1][y].isValid)
+            return true;
+        if (x + 1 < options.columns && tiles[x + 1][y].isValid)
+            return true;
+        if (y > 0 && tiles[x][y - 1].isValid)
+            return true;
+        if (y + 1 < options.rows && tiles[x][y + 1].isValid)
+            return true;
+        return false;
+    }
+
+    private void checkGameOver() {
+        import std.stdio; writeln("TODO checkGameOver ", score); // TODO
     }
 }

@@ -53,7 +53,7 @@ final class GameWindow : ApplicationWindow {
         aboutButton.setTooltipMarkup("About <b>a</b>");
         quitButton = new ToolButton(StockID.QUIT);
         quitButton.setTooltipMarkup("Quit <b>q</b> <i>or</i> <b>Esc</b>");
-        board = new Board(&onChangeScore);
+        board = new Board(&onChangeState);
         statusLabel = new Label("0/0");
     }
 
@@ -159,9 +159,9 @@ final class GameWindow : ApplicationWindow {
         destroy;
     }
 
-    private void onChangeScore(int score, Board.State state) {
+    private void onChangeState(int score, Board.State state) {
         // TODO
         import std.stdio: writefln;
-        writefln("onChangeScore %s %s", score, state);
+        writefln("onChangeState %s %s", score, state);
     }
 }
