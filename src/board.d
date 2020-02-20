@@ -1,7 +1,6 @@
 // Copyright © 2020 Mark Summerfield. All rights reserved.
 
 import gtk.DrawingArea: DrawingArea;
-import std.typecons: Tuple;
 
 final class Board : DrawingArea {
     import cairo.Context: Context, Scoped;
@@ -11,6 +10,7 @@ final class Board : DrawingArea {
     import options: Options;
     import point: Point;
     import std.container.rbtree: RedBlackTree;
+    import std.typecons: Tuple;
 
     enum Direction { UP, DOWN, LEFT, RIGHT }
     enum State { PLAYING, GAME_OVER, USER_WON }
@@ -47,8 +47,8 @@ final class Board : DrawingArea {
         score = 0;
         selected = Point();
         auto rnd = Random(unpredictableSeed);
-        auto colors = COLORS.byKey.array.randomSample(
-            options.maxColors, rnd);
+        auto colors = COLORS.byKey.array.randomSample(options.maxColors,
+                                                      rnd);
         tiles = new Color[][](options.columns, options.rows);
         each!(t => tiles[t[0]][t[1]] = colors.array.choice(rnd))
              (allTilesRange);
@@ -62,7 +62,7 @@ final class Board : DrawingArea {
         return cartesianProduct(iota(options.columns), iota(options.rows));
     }
 
-    private void doDraw(int delayMs = 0) {
+    private void doDraw(int delayMs=0) {
         if (delayMs > 0) {
             import glib.Timeout: Timeout;
             new Timeout(delayMs, delegate bool() {
