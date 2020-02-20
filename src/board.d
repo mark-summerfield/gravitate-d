@@ -292,7 +292,7 @@ final class Board : DrawingArea {
                 selected.y = options.rows / 2;
             }
         }
-        doDraw;
+        doDraw(options.delayMs);
         score += (round(sqrt(options.columns * options.rows.to!double)) +
                   pow(count, options.maxColors / 2)).to!int;
         checkGameOver;
@@ -357,27 +357,26 @@ final class Board : DrawingArea {
 
     private MovePoint nearestToMiddle(const int x, const int y,
                                       const PointSet empties) {
-        import std.algorithm: minElement;
-        import std.container: heapify;
         import std.math: hypot;
-
-        alias RadiusPoint = Tuple!(double, "radius", Point, "point");
 
         immutable color = tiles[x][y];
         immutable midx = options.columns / 2;
         immutable midy = options.rows / 2;
         immutable oldRadius = hypot(midx - x, midy - y);
-        RadiusPoint[] ppoints;
+        double shortestRadius;
+        Point rp;
         foreach (p; empties)
             if (isSquare(p)) {
                 auto newRadius = hypot(midx - p.x, midy - p.y);
                 if (isLegal(p, color))
                     newRadius -= 0.1; // Make same colors slightly attract
-                ppoints ~= RadiusPoint(newRadius, p);
+                if (!rp.isValid || shortestRadius > newRadius) {
+                    shortestRadius = newRadius;
+                    rp = p;
+                }
             }
-        immutable pp = ppoints.minElement!(a => a.radius);
-        if (oldRadius > pp.radius)
-            return MovePoint(true, pp.point);
+        if (oldRadius > shortestRadius)
+            return MovePoint(true, rp);
         return MovePoint(false, Point(x, y));
     }
 
