@@ -10,6 +10,7 @@ final class Board : DrawingArea {
     import options: Options;
     import point: Point;
     import std.container.rbtree: RedBlackTree;
+    import std.random: Random, unpredictableSeed;
     import std.typecons: Tuple;
 
     enum Direction { UP, DOWN, LEFT, RIGHT }
@@ -23,6 +24,7 @@ final class Board : DrawingArea {
         alias MovePoint = Tuple!(bool, "move", Point, "point");
 
         OnChangeStateFn onChangeState;
+        Random rnd;
         auto options = Options();
         State state;
         int score;
@@ -32,6 +34,7 @@ final class Board : DrawingArea {
 
     this(OnChangeStateFn onChangeState) {
         this.onChangeState = onChangeState;
+        rnd = Random(unpredictableSeed);
         setSizeRequest(150, 150); // Minimum size
         addOnDraw(&onDraw);
         addOnButtonPress(&onMouseButtonPress);
@@ -43,12 +46,11 @@ final class Board : DrawingArea {
         import color: COLORS;
         import std.algorithm: each;
         import std.array: array;
-        import std.random: choice, Random, randomSample, unpredictableSeed;
+        import std.random: choice, randomSample;
 
         state = State.PLAYING;
         score = 0;
         selected.clear();
-        auto rnd = Random(unpredictableSeed);
         auto colors = COLORS.byKey.array.randomSample(options.maxColors,
                                                       rnd);
         tiles = new Color[][](options.columns, options.rows);
@@ -315,9 +317,7 @@ final class Board : DrawingArea {
     private int[] rippleRange(const int limit) {
         import std.array: array;
         import std.range: iota;
-        import std.random: Random, randomShuffle, unpredictableSeed;
-
-        auto rnd = Random(unpredictableSeed);
+        import std.random: randomShuffle;
         return iota(limit).array.randomShuffle(rnd);
     }
 
@@ -361,22 +361,22 @@ final class Board : DrawingArea {
         import std.container: heapify;
         import std.math: hypot;
 
-        alias PriorityPoint = Tuple!(double, "priority", Point, "point");
+        alias RadiusPoint = Tuple!(double, "radius", Point, "point");
 
         immutable color = tiles[x][y];
         immutable midx = options.columns / 2;
         immutable midy = options.rows / 2;
-        immutable dold = hypot(midx - x, midy - y);
-        PriorityPoint[] ppoints;
+        immutable oldRadius = hypot(midx - x, midy - y);
+        RadiusPoint[] ppoints;
         foreach (p; empties)
             if (isSquare(p)) {
-                auto dnew = hypot(midx - p.x, midy - p.y);
+                auto newRadius = hypot(midx - p.x, midy - p.y);
                 if (isLegal(p, color))
-                    dnew -= 0.1; // Make same colors slightly attractive
-                ppoints ~= PriorityPoint(dnew, p);
+                    newRadius -= 0.1; // Make same colors slightly attract
+                ppoints ~= RadiusPoint(newRadius, p);
             }
-        immutable pp = ppoints.minElement!(a => a.priority);
-        if (dold > pp.priority)
+        immutable pp = ppoints.minElement!(a => a.radius);
+        if (oldRadius > pp.radius)
             return MovePoint(true, pp.point);
         return MovePoint(false, Point(x, y));
     }
