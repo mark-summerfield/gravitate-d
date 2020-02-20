@@ -6,13 +6,10 @@ struct Color {
     alias Rgb = Tuple!(double, "red", double, "green", double, "blue");
     alias Pair = Tuple!(Color, "light", Color, "dark");
 
-    enum ACTIVE_BG = Color(0xFF, 0xFE, 0xE0);
-    enum INACTIVE_BG = Color(0xF0, 0xF0, 0xF0);
-    enum ACTIVE_FOCUS_RECT = Color(0xF, 0xF, 0xF); // almost black
-    enum INACTIVE_FOCUS_RECT = Color(0x7F, 0x7F, 0x7F); // gray
+    enum BACKGROUND = Color(0xFF, 0xFE, 0xE0);
+    enum FOCUS_RECT = Color(0xF, 0xF, 0xF); // almost black
+
     enum INVALID = -1;
-    enum DARKEN = -0.5;
-    enum LIGHTEN = 0.5;
 
     private int red = INVALID;
     private int green = INVALID;
@@ -27,7 +24,10 @@ struct Color {
         return Rgb(red / 255.0, green / 255.0, blue / 255.0);
     }
 
-    /// luminosity: lighten = (0.0 1.0]; darken = (0.0 -1.0]
+    enum DARKEN = -0.5;
+    enum LIGHTEN = 0.5;
+
+    // luminosity: lighten = (0.0 1.0]; darken = (0.0 -1.0]
     Color morphed(double luminosity) const {
         assert(isValid());
         import std.conv: to;
@@ -52,19 +52,19 @@ struct Color {
     }
 }
 
-immutable Color[Color] GAME_COLORS;
+immutable Color[Color] COLORS;
 
 shared static this() {
     import std.exception: assumeUnique;
 
-    Color[Color] temp;
-    temp[Color(0x00, 0x00, 0x80)] = Color(0x99, 0x99, 0xF9);
-    temp[Color(0x00, 0x80, 0x00)] = Color(0x99, 0xF9, 0x99);
-    temp[Color(0x00, 0x80, 0x80)] = Color(0x99, 0xF9, 0xF9);
-    temp[Color(0x80, 0x00, 0x00)] = Color(0xF9, 0x99, 0x99);
-    temp[Color(0x80, 0x00, 0x80)] = Color(0xF9, 0x99, 0xF9);
-    temp[Color(0x80, 0x80, 0x00)] = Color(0xF9, 0xF9, 0x99);
-    temp[Color(0x80, 0x80, 0x80)] = Color(0xF9, 0xF9, 0xF9);
-    temp.rehash;
-    GAME_COLORS = assumeUnique(temp);
+    Color[Color] colors;
+    colors[Color(0x00, 0x00, 0x80)] = Color(0x99, 0x99, 0xF9);
+    colors[Color(0x00, 0x80, 0x00)] = Color(0x99, 0xF9, 0x99);
+    colors[Color(0x00, 0x80, 0x80)] = Color(0x99, 0xF9, 0xF9);
+    colors[Color(0x80, 0x00, 0x00)] = Color(0xF9, 0x99, 0x99);
+    colors[Color(0x80, 0x00, 0x80)] = Color(0xF9, 0x99, 0xF9);
+    colors[Color(0x80, 0x80, 0x00)] = Color(0xF9, 0xF9, 0x99);
+    colors[Color(0x80, 0x80, 0x80)] = Color(0xF9, 0xF9, 0xF9);
+    colors.rehash;
+    COLORS = assumeUnique(colors);
 }

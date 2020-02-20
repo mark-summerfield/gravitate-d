@@ -33,22 +33,21 @@ final class Board : DrawingArea {
     }
 
     void newGame() {
-        import color: GAME_COLORS;
+        import color: COLORS;
+        import std.algorithm: cartesianProduct, each;
         import std.array: array;
         import std.random: choice, Random, randomSample, unpredictableSeed;
+        import std.range: iota;
 
         state = State.PLAYING;
         score = 0;
         selected = Point();
         auto rnd = Random(unpredictableSeed);
-        auto colors = GAME_COLORS.byKey.array.randomSample(
+        auto colors = COLORS.byKey.array.randomSample(
             options.maxColors, rnd);
         tiles = new Color[][](options.columns, options.rows);
-        for (int x = 0; x < options.columns; x++) {
-            for (int y = 0; y < options.rows; y++) {
-                tiles[x][y] = colors.array.choice(rnd);
-            }
-        }
+        each!(t => tiles[t[0]][t[1]] = colors.array.choice(rnd))
+             (cartesianProduct(iota(options.columns), iota(options.rows)));
         doDraw();
         onChangeState(score, state);
     }
@@ -63,15 +62,15 @@ final class Board : DrawingArea {
     }
 
     private bool onDraw(Scoped!Context context, Widget) {
-        import std.algorithm: min;
+        import std.algorithm: cartesianProduct, each, min;
         import std.conv: to;
         import std.math: round;
+        import std.range: iota;
 
         immutable size = tileSize();
         immutable edge = round(min(size.width, size.height) / 9).to!int;
-        for (int x = 0; x < options.columns; x++)
-            for (int y = 0; y < options.rows; y++)
-                drawTile(context, x, y, size, edge);
+        each!(t => drawTile(context, t[0], t[1], size, edge))
+             (cartesianProduct(iota(options.columns), iota(options.rows)));
         return true;
     }
 
@@ -87,7 +86,7 @@ final class Board : DrawingArea {
         immutable color = tiles[x][y];
         if (!color.isValid()) {
             context.rectangle(x1, y1, size.width, size.height);
-            context.setSourceRgb(Color.ACTIVE_BG.toRgb.expand);
+            context.setSourceRgb(Color.BACKGROUND.toRgb.expand);
             context.fill();
         } else {
             import cairo.Pattern: Pattern;
@@ -110,10 +109,10 @@ final class Board : DrawingArea {
     }
 
     private Color.Pair colorPair(Color color) {
-        import color: GAME_COLORS;
+        import color: COLORS;
 
-        immutable plight = color in GAME_COLORS;
-        Color light = plight is null ? Color.ACTIVE_BG : *plight;
+        immutable plight = color in COLORS;
+        Color light = plight is null ? Color.BACKGROUND : *plight;
         auto dark = color;
         if (state != State.PLAYING) {
             light = light.morphed(Color.DARKEN);
@@ -156,7 +155,7 @@ final class Board : DrawingArea {
         context.setDash([1.5], 0);
         context.rectangle(x1 + indent, y1 + indent, size.width - indent2,
                           size.height - indent2);
-        context.setSourceRgb(Color.ACTIVE_FOCUS_RECT.toRgb.expand);
+        context.setSourceRgb(Color.FOCUS_RECT.toRgb.expand);
         context.stroke();
     }
 
