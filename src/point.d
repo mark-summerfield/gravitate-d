@@ -1,12 +1,17 @@
 // Copyright © 2020 Mark Summerfield. All rights reserved.
 
 struct Point {
-    enum INVALID = -1;
+    private enum INVALID = -1;
 
     int x = INVALID;
     int y = INVALID;
 
     bool isValid() const {
-        return x != INVALID && y != INVALID;
+        return x > INVALID && y > INVALID;
+    }
+
+    void clear() {
+        x = INVALID;
+        y = INVALID;
     }
 }

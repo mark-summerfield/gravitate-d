@@ -1,5 +1,6 @@
 // Copyright © 2020 Mark Summerfield. All rights reserved.
 
+// TODO test with columns != rows
 struct Options {
     int columns = 9;
     int rows = 9;

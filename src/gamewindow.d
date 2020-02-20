@@ -10,14 +10,16 @@ final class GameWindow : ApplicationWindow {
     import gtk.ToolButton: ToolButton;
     import gtk.Widget: Widget;
 
-    private ToolButton newButton;
-    private ToolButton optionsButton;
-    private ToolButton helpButton;
-    private ToolButton aboutButton;
-    private ToolButton quitButton;
-    private Board board;
-    private Label statusLabel;
-    private bool terminating;
+    private {
+        ToolButton newButton;
+        ToolButton optionsButton;
+        ToolButton helpButton;
+        ToolButton aboutButton;
+        ToolButton quitButton;
+        Board board;
+        Label statusLabel;
+        bool terminating;
+    }
 
     this(Application application) {
         import common: APPNAME, ICON;
@@ -36,7 +38,7 @@ final class GameWindow : ApplicationWindow {
         showAll();
     }
 
-    void makeWidgets() {
+    private void makeWidgets() {
         import gtk.IconSize: IconSize;
         import gtk.Image: Image;
         import gtkc.gtktypes: StockID;
@@ -55,7 +57,7 @@ final class GameWindow : ApplicationWindow {
         statusLabel = new Label("0/0");
     }
 
-    void makeLayout() {
+    private void makeLayout() {
         import gtk.Box: Box;
         import gtkc.gtktypes: GtkOrientation;
 
@@ -78,7 +80,7 @@ final class GameWindow : ApplicationWindow {
         add(vbox);
     }
 
-    void makeBindings() {
+    private void makeBindings() {
         newButton.addOnClicked(&onNew);
         optionsButton.addOnClicked(&onOptions);
         helpButton.addOnClicked(&onHelp);
@@ -87,7 +89,7 @@ final class GameWindow : ApplicationWindow {
         addOnDestroy(&onQuit);
     }
 
-    bool onKeyPress(Event event, Widget) {
+    private bool onKeyPress(Event event, Widget) {
         import gdk.Keymap : Keymap;
 
         uint kv;
@@ -108,32 +110,47 @@ final class GameWindow : ApplicationWindow {
         case "q", "Q", "Escape":
             onQuit(null);
             return true;
+        case "Left":
+            board.navigate(Board.Direction.LEFT);
+            return true;
+        case "Right":
+            board.navigate(Board.Direction.RIGHT);
+            return true;
+        case "Up":
+            board.navigate(Board.Direction.UP);
+            return true;
+        case "Down":
+            board.navigate(Board.Direction.DOWN);
+            return true;
+        case "space":
+            board.chooseTile();
+            return true;
         default:
             return false;
         }
     }
 
-    void onNew(ToolButton) {
+    private void onNew(ToolButton) {
         import std.stdio: writeln;
         writeln("onNew"); // TODO
     }
 
-    void onOptions(ToolButton) {
+    private void onOptions(ToolButton) {
         import std.stdio: writeln;
         writeln("onOptions"); // TODO
     }
 
-    void onHelp(ToolButton) {
+    private void onHelp(ToolButton) {
         import std.stdio: writeln;
         writeln("onHelp"); // TODO
     }
 
-    void onAbout(ToolButton) {
+    private void onAbout(ToolButton) {
         import aboutbox: about;
         about(this);
     }
 
-    void onQuit(Widget) {
+    private void onQuit(Widget) {
         if (terminating)
             return;
         terminating = true;
@@ -141,7 +158,7 @@ final class GameWindow : ApplicationWindow {
         destroy();
     }
 
-    void onChangeScore(int score, Board.State state) {
+    private void onChangeScore(int score, Board.State state) {
         // TODO
         import std.stdio: writefln;
         writefln("onChangeScore %s %s", score, state);

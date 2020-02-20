@@ -6,38 +6,40 @@ import std.typecons: Tuple;
 final class Board : DrawingArea {
     import cairo.Context: Context, Scoped;
     import color: Color;
+    import gdk.Event: Event;
     import gtk.Widget: Widget;
     import options: Options;
     import point: Point;
 
+    enum Direction { UP, DOWN, LEFT, RIGHT }
     enum State { PLAYING, GAME_OVER, USER_WON }
 
-    enum Direction { UP, DOWN, LEFT, RIGHT }
+    private {
+        alias Size = Tuple!(int, "width", int, "height");
+        alias OnChangeStateFn = void delegate(int, State);
 
-    private alias Size = Tuple!(int, "width", int, "height");
-    private alias OnChangeStateFn = void delegate(int, State);
-
-    private OnChangeStateFn onChangeState;
-    private auto options = Options();
-    private State state;
-    private int score;
-    private Point selected;
-    private Color[][] tiles;
+        OnChangeStateFn onChangeState;
+        auto options = Options();
+        State state;
+        int score;
+        Point selected;
+        Color[][] tiles;
+    }
 
     this(OnChangeStateFn onChangeState) {
         this.onChangeState = onChangeState;
         setSizeRequest(150, 150); // Minimum size
         addOnDraw(&onDraw);
+        addOnButtonPress(&onMouseButtonPress);
         setRedrawOnAllocate(true);
         newGame();
     }
 
     void newGame() {
         import color: COLORS;
-        import std.algorithm: cartesianProduct, each;
+        import std.algorithm: each;
         import std.array: array;
         import std.random: choice, Random, randomSample, unpredictableSeed;
-        import std.range: iota;
 
         state = State.PLAYING;
         score = 0;
@@ -47,9 +49,15 @@ final class Board : DrawingArea {
             options.maxColors, rnd);
         tiles = new Color[][](options.columns, options.rows);
         each!(t => tiles[t[0]][t[1]] = colors.array.choice(rnd))
-             (cartesianProduct(iota(options.columns), iota(options.rows)));
+             (allTilesRange());
         doDraw();
         onChangeState(score, state);
+    }
+
+    private auto allTilesRange() {
+        import std.algorithm: cartesianProduct;
+        import std.range: iota;
+        return cartesianProduct(iota(options.columns), iota(options.rows));
     }
 
     private void doDraw(int delayMs = 0) {
@@ -62,15 +70,14 @@ final class Board : DrawingArea {
     }
 
     private bool onDraw(Scoped!Context context, Widget) {
-        import std.algorithm: cartesianProduct, each, min;
+        import std.algorithm: each, min;
         import std.conv: to;
         import std.math: round;
-        import std.range: iota;
 
         immutable size = tileSize();
         immutable edge = round(min(size.width, size.height) / 9).to!int;
         each!(t => drawTile(context, t[0], t[1], size, edge))
-             (cartesianProduct(iota(options.columns), iota(options.rows)));
+             (allTilesRange());
         return true;
     }
 
@@ -159,5 +166,71 @@ final class Board : DrawingArea {
         context.stroke();
     }
 
-    // TODO mouse & keyboard & game logic
+    private bool onMouseButtonPress(Event event, Widget) {
+        if (state == State.PLAYING) {
+            import std.conv: to;
+            import std.math: floor;
+
+            auto size = tileSize();
+            double eventX;
+            double eventY;
+            event.getCoords(eventX, eventY);
+            immutable x = floor(eventX / size.width).to!int;
+            immutable y = floor(eventY / size.height).to!int;
+            selected.clear();
+            deleteTiles(Point(x, y));
+        }
+        return true;
+    }
+
+    void navigate(Direction direction) {
+        if (state != State.PLAYING)
+            return;
+        if (!selected.isValid()) {
+            selected.x = options.columns / 2;
+            selected.y = options.rows / 2;
+        } else {
+            int x = selected.x;
+            int y = selected.y;
+            final switch (direction) {
+            case Direction.LEFT: x--; break;
+            case Direction.RIGHT: x++; break;
+            case Direction.UP: y--; break;
+            case Direction.DOWN: y++; break;
+            }
+            if (0 <= x && x < options.columns && 0 <= y && y < options.rows
+                    && tiles[x][y].isValid()) {
+                selected.x = x;
+                selected.y = y;
+            }
+        }
+        doDraw();
+    }
+
+    void chooseTile() {
+        if (state != State.PLAYING || !selected.isValid())
+            return;
+        deleteTiles(selected);
+    }
+
+    private void deleteTiles(Point p) {
+        auto color = tiles[p.x][p.y];
+        if (!color.isValid() || !isLegal(p, color))
+            return;
+        // TODO
+    }
+
+    private bool isLegal(Point p, Color color) {
+        immutable x = p.x;
+        immutable y = p.y;
+        if (x > 0 && color == tiles[x - 1][y])
+            return true;
+        if (x + 1 < options.columns && color == tiles[x + 1][y])
+            return true;
+        if (y > 0 && color == tiles[x][y - 1])
+            return true;
+        if (y + 1 < options.rows && color == tiles[x][y + 1])
+            return true;
+        return false;
+    }
 }

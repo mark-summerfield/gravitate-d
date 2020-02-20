@@ -9,11 +9,14 @@ struct Color {
     enum BACKGROUND = Color(0xFF, 0xFE, 0xE0);
     enum FOCUS_RECT = Color(0xF, 0xF, 0xF); // almost black
 
-    enum INVALID = -1;
 
-    private int red = INVALID;
-    private int green = INVALID;
-    private int blue = INVALID;
+    private {
+        enum INVALID = -1;
+
+        int red = INVALID;
+        int green = INVALID;
+        int blue = INVALID;
+    }
 
     bool isValid() const {
         return red > INVALID && green > INVALID && blue > INVALID;
