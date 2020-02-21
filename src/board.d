@@ -68,10 +68,9 @@ final class Board : DrawingArea {
 
     private void doDraw(const int delayMs=0) {
         if (delayMs > 0) {
-            import glib.c.types: GPriority;
             import glib.Timeout: Timeout;
             new Timeout(delayMs, delegate bool() {
-                queueDraw; return false; }, GPriority.LOW, false);
+                queueDraw; return false; }, false);
         } else
             queueDraw;
     }
