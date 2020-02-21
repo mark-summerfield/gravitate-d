@@ -176,7 +176,7 @@ final class GameWindow : ApplicationWindow {
                 message = format("%,d You Won!", score);
         } else // still playing
             message = format("%,d/%,d", score, highScore);
-        //statusLabel.setText(message); // BUG
-        import std.stdio: writeln; writeln(message);
+	if (statusLabel !is null)
+	    statusLabel.setText(message);
     }
 }

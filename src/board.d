@@ -328,7 +328,7 @@ final class Board : DrawingArea {
             immutable mp = nearestToMiddle(x, y, empties);
             immutable np = mp.point;
             auto seen = np in moves;
-            if (seen != null && *seen == p)
+            if (seen !is null && *seen == p)
                 return false; // Avoid endless loop back and forth
             if (mp.move) {
                 tiles[np.x][np.y] = tiles[x][y];
