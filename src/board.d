@@ -68,9 +68,10 @@ final class Board : DrawingArea {
 
     private void doDraw(const int delayMs=0) {
         if (delayMs > 0) {
+            import glib.c.types: GPriority;
             import glib.Timeout: Timeout;
             new Timeout(delayMs, delegate bool() {
-                queueDraw; return false; }, false);
+                queueDraw; return false; }, GPriority.LOW, false);
         } else
             queueDraw;
     }
@@ -292,7 +293,6 @@ final class Board : DrawingArea {
                 selected.y = options.rows / 2;
             }
         }
-        doDraw(options.delayMs);
         score += (round(sqrt(options.columns * options.rows.to!double)) +
                   pow(count, options.maxColors / 2)).to!int;
         checkGameOver;
@@ -323,9 +323,6 @@ final class Board : DrawingArea {
 
     private bool moveIsPossible(const int x, const int y,
                                 ref PointMap moves) {
-        import std.conv: to;
-        import std.math: fmax, round;
-
         immutable p = Point(x, y);
         auto empties = emptyNeighbours(x, y);
         if (!empties.empty) {
@@ -338,7 +335,9 @@ final class Board : DrawingArea {
                 tiles[np.x][np.y] = tiles[x][y];
                 tiles[x][y] = Color(); // invalid color
                 moves[p] = np;
-                doDraw(round(fmax(1, options.delayMs / 3.0)).to!int);
+                // Gtk (sensibly) seems to gather all these so they end up
+                // being done in one go
+                doDraw(options.delayMs);
                 return true;
             }
         }
@@ -357,7 +356,7 @@ final class Board : DrawingArea {
 
     private MovePoint nearestToMiddle(const int x, const int y,
                                       const PointSet empties) {
-        import std.math: hypot;
+        import std.math: hypot, isNaN;
 
         immutable color = tiles[x][y];
         immutable midx = options.columns / 2;
@@ -375,7 +374,7 @@ final class Board : DrawingArea {
                     rp = p;
                 }
             }
-        if (oldRadius > shortestRadius)
+        if (!isNaN(shortestRadius) && oldRadius > shortestRadius)
             return MovePoint(true, rp);
         return MovePoint(false, Point(x, y));
     }
