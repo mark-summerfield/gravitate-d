@@ -394,6 +394,28 @@ final class Board : DrawingArea {
     }
 
     private void checkGameOver() {
-        import std.stdio; writeln("TODO checkGameOver ", score); // TODO
+        import std.algorithm: any, each;
+
+        int[Color] countForColor;
+        bool userWon = true;
+        bool canMove = false;
+
+        void check(const int x, const int y) {
+            immutable color = tiles[x][y];
+            if (color.isValid) {
+                userWon = false;
+                countForColor[color]++;
+                if (isLegal(Point(x, y), color))
+                    canMove = true;
+            }
+        }
+
+        each!(xy => check(xy[0], xy[1]))(allTilesRange);
+        canMove = !any!(a => a == 1)(countForColor.byValue);
+
+        if (userWon)
+            state = State.USER_WON;
+        else if (!canMove)
+            state = State.GAME_OVER;
     }
 }
