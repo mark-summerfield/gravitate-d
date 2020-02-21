@@ -19,6 +19,7 @@ final class GameWindow : ApplicationWindow {
         Board board;
         Label statusLabel;
         bool terminating;
+        int highScore;
     }
 
     this(Application application) {
@@ -31,6 +32,7 @@ final class GameWindow : ApplicationWindow {
         makeLayout;
         makeBindings;
         addOnKeyPress(&onKeyPress);
+        // TODO load highScore
         // TODO load size/pos (with default fallbacks)
         immutable width = 400;
         immutable height = 400;
@@ -160,8 +162,21 @@ final class GameWindow : ApplicationWindow {
     }
 
     private void onChangeState(int score, Board.State state) {
-        // TODO
-        import std.stdio: writefln;
-        writefln("onChangeState %s %s", score, state);
+        import std.format: format;
+
+        string message;
+        if (state == Board.State.GAME_OVER)
+            message = format("%,d Game Over", score);
+        else if (state == Board.State.USER_WON) {
+            if (score > highScore) {
+                message = format("%,d New High Score!", score);
+                highScore = score;
+                // TODO save highScore
+            } else
+                message = format("%,d You Won!", score);
+        } else // still playing
+            message = format("%,d/%,d", score, highScore);
+        //statusLabel.setText(message); // BUG
+        import std.stdio: writeln; writeln(message);
     }
 }

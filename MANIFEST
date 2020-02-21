@@ -1,3 +1,5 @@
+# TODO try to use Gtk equiv of signals/slots for onChangeState?
+
 src/app.d
 src/gamewindow.d
 src/board.d
