@@ -1,4 +1,4 @@
-# TODO: load/save highScore & win size/pos
+# TODO: config.d: load/save highScore & win size/pos
 # TODO: Help
 # TODO: Options
 
@@ -6,7 +6,7 @@ src/app.d
 src/gamewindow.d
 src/board.d
 src/aboutbox.d
-src/options.d
+src/config.d # TODO
 src/point.d
 src/color.d
 src/common.d

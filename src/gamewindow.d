@@ -9,6 +9,7 @@ final class GameWindow : ApplicationWindow {
     import gtk.Label: Label;
     import gtk.ToolButton: ToolButton;
     import gtk.Widget: Widget;
+    static import config;
 
     private {
         ToolButton newButton;
@@ -19,24 +20,21 @@ final class GameWindow : ApplicationWindow {
         Board board;
         Label statusLabel;
         bool terminating;
-        int highScore;
     }
 
     this(Application application) {
         import common: APPNAME, ICON;
 
         super(application);
+        config.initialize(application.getApplicationId);
         setTitle(APPNAME);
         setIconFromFile(ICON); // TODO embed or SVG
         makeWidgets;
         makeLayout;
         makeBindings;
         addOnKeyPress(&onKeyPress);
-        // TODO load highScore
-        // TODO load size/pos (with default fallbacks)
-        immutable width = 400;
-        immutable height = 400;
-        setDefaultSize(width, height);
+        // TODO use config.x and config.y to set window position
+        setDefaultSize(config.width, config.height);
         showAll;
         board.newGame;
     }
@@ -157,7 +155,7 @@ final class GameWindow : ApplicationWindow {
         if (terminating)
             return;
         terminating = true;
-        import std.stdio: writeln; writeln("onQuit: save size/pos"); // TODO
+        config.save;
         destroy;
     }
 
@@ -168,14 +166,14 @@ final class GameWindow : ApplicationWindow {
         if (state == Board.State.GAME_OVER)
             message = format("%,d Game Over", score);
         else if (state == Board.State.USER_WON) {
-            if (score > highScore) {
+            if (score > config.highScore) {
                 message = format("%,d New High Score!", score);
-                highScore = score;
-                // TODO save highScore
+                config.highScore = score;
+                config.save;
             } else
                 message = format("%,d You Won!", score);
         } else // still playing
-            message = format("%,d/%,d", score, highScore);
+            message = format("%,d/%,d", score, config.highScore);
 	    statusLabel.setText(message);
     }
 }
