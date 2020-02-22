@@ -160,11 +160,11 @@ final class GameWindow : ApplicationWindow {
         int a;
         int b;
         getSize(a, b);
-        cfg.setWidth(a);
-        cfg.setHeight(b);
+        cfg.width(a);
+        cfg.height(b);
         getPosition(a, b);
-        cfg.setX(a);
-        cfg.setY(b);
+        cfg.x(a);
+        cfg.y(b);
         cfg.save;
         destroy;
     }
@@ -178,7 +178,7 @@ final class GameWindow : ApplicationWindow {
         else if (state == Board.State.USER_WON) {
             if (score > cfg.highScore) {
                 message = format("%,d New High Score!", score);
-                cfg.setHighScore(score);
+                cfg.highScore(score);
                 cfg.save;
             } else
                 message = format("%,d You Won!", score);

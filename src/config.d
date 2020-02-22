@@ -11,65 +11,64 @@ struct Config {
         import std.array: replace;
         import std.path: buildPath, dirSeparator;
 
-        filename = buildPath(
-                gutil.getUserConfigDir,
-                applicationId.replace('.', dirSeparator) ~ ".ini");
+        filename = buildPath(gutil.getUserConfigDir,
+                             applicationId.replace('.',
+                                                   dirSeparator) ~ ".ini");
         load();
     }
 
     int maxColors() const { return _maxColors; }
 
-    void setMaxColors(int maxColors=DEF_MAXCOLORS, int low=2,
-                      int high=COLORS.length.to!int) {
+    void maxColors(int maxColors, int low=2,
+                   int high=COLORS.length.to!int) {
         _maxColors = clamp(maxColors, low, high);
     }
 
     int columns() const { return _columns; }
 
-    void setColumns(int columns=DEF_COLUMNS, int low=5, int high=30) {
+    void columns(int columns, int low=5, int high=30) {
         _columns = clamp(columns, low, high);
     }
 
     int rows() const { return _rows; }
 
-    void setRows(int rows=DEF_ROWS, int low=5, int high=30) {
+    void rows(int rows, int low=5, int high=30) {
         _rows = clamp(rows, low, high);
     }
 
     int delayMs() const { return _delayMs; }
 
-    void setDelayMs(int delayMs=DEF_DELAYMS, int low=0, int high=1000) {
+    void delayMs(int delayMs, int low=0, int high=1000) {
         _delayMs = clamp(delayMs, low, high);
     }
 
     int highScore() const { return _highScore; }
 
-    void setHighScore(int highScore=DEF_HIGHSCORE, int low=0,
-                      int high=int.max) {
+    void highScore(int highScore, int low=0, int high=int.max) {
         _highScore = clamp(highScore, low, high);
     }
 
     int x() const { return _x; }
 
-    void setX(int x=DEF_X) {
+    void x(int x) {
         _x = x;
     }
 
     int y() const { return _y; }
 
-    void setY(int y=DEF_Y) {
+    void y(int y) {
         _y = y;
     }
 
     int width() const { return _width; }
 
-    void setWidth(int width=DEF_WIDTH, int low=200, int high=int.max) {
+    void width(int width, int low=200, int high=int.max) {
         _width = clamp(width, low, high);
     }
 
     int height() const { return _height; }
 
-    void setHeight(int height=DEF_HEIGHT, int low=200, int high=int.max) {
+    void height(int height, int low=200, int high=int.max) {
         _height = clamp(height, low, high);
     }
 
@@ -84,15 +83,15 @@ struct Config {
             stderr.writeln("failed to load config");
             return;
         }
-        setMaxColors(getInt(keyFile, BOARD, MAXCOLORS, DEF_MAXCOLORS));
-        setColumns(getInt(keyFile, BOARD, COLUMNS, DEF_COLUMNS));
-        setRows(getInt(keyFile, BOARD, ROWS, DEF_ROWS));
-        setDelayMs(getInt(keyFile, BOARD, DELAYMS, DEF_DELAYMS));
-        setHighScore(getInt(keyFile, BOARD, HIGHSCORE, DEF_HIGHSCORE));
-        setX(getInt(keyFile, WINDOW, X, DEF_X));
-        setY(getInt(keyFile, WINDOW, Y, DEF_Y));
-        setWidth(getInt(keyFile, WINDOW, WIDTH, DEF_WIDTH));
-        setHeight(getInt(keyFile, WINDOW, HEIGHT, DEF_HEIGHT));
+        maxColors(getInt(keyFile, BOARD, MAXCOLORS, DEF_MAXCOLORS));
+        columns(getInt(keyFile, BOARD, COLUMNS, DEF_COLUMNS));
+        rows(getInt(keyFile, BOARD, ROWS, DEF_ROWS));
+        delayMs(getInt(keyFile, BOARD, DELAYMS, DEF_DELAYMS));
+        highScore(getInt(keyFile, BOARD, HIGHSCORE, DEF_HIGHSCORE));
+        x(getInt(keyFile, WINDOW, X, DEF_X));
+        y(getInt(keyFile, WINDOW, Y, DEF_Y));
+        width(getInt(keyFile, WINDOW, WIDTH, DEF_WIDTH));
+        height(getInt(keyFile, WINDOW, HEIGHT, DEF_HEIGHT));
     }
 
     private int getInt(ref KeyFile keyFile, string group, string key,
