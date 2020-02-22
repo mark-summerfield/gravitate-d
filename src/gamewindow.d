@@ -38,6 +38,7 @@ final class GameWindow : ApplicationWindow {
         immutable height = 400;
         setDefaultSize(width, height);
         showAll;
+        board.newGame;
     }
 
     private void makeWidgets() {
@@ -134,8 +135,7 @@ final class GameWindow : ApplicationWindow {
     }
 
     private void onNew(ToolButton) {
-        import std.stdio: writeln;
-        writeln("onNew"); // TODO
+        board.newGame;
     }
 
     private void onOptions(ToolButton) {
@@ -176,7 +176,6 @@ final class GameWindow : ApplicationWindow {
                 message = format("%,d You Won!", score);
         } else // still playing
             message = format("%,d/%,d", score, highScore);
-	if (statusLabel !is null)
 	    statusLabel.setText(message);
     }
 }

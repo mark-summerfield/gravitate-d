@@ -1,3 +1,7 @@
+# TODO: load/save highScore & win size/pos
+# TODO: Help
+# TODO: Options
+
 src/app.d
 src/gamewindow.d
 src/board.d
@@ -10,7 +14,5 @@ src/common.d
 dub.json
 st.sh
 
-~/app/gravitate/nim/MANIFEST
-~/app/gravitate/jv/MANIFEST
-
 # TODO SVG icons?
+# vim: syn=yaml

@@ -10,7 +10,6 @@ final class Board : DrawingArea {
     import options: Options;
     import point: Point;
     import std.container.rbtree: RedBlackTree;
-    import std.random: Random, unpredictableSeed;
     import std.typecons: Tuple;
 
     enum Direction { UP, DOWN, LEFT, RIGHT }
@@ -24,7 +23,6 @@ final class Board : DrawingArea {
         alias MovePoint = Tuple!(bool, "move", Point, "point");
 
         OnChangeStateFn onChangeState;
-        Random rnd;
         auto options = Options();
         State state;
         int score;
@@ -34,12 +32,10 @@ final class Board : DrawingArea {
 
     this(OnChangeStateFn onChangeState) {
         this.onChangeState = onChangeState;
-        rnd = Random(unpredictableSeed);
         setSizeRequest(150, 150); // Minimum size
         addOnDraw(&onDraw);
         addOnButtonPress(&onMouseButtonPress);
         setRedrawOnAllocate(true);
-        newGame;
     }
 
     void newGame() {
@@ -51,10 +47,10 @@ final class Board : DrawingArea {
         state = State.PLAYING;
         score = 0;
         selected.clear();
-        auto colors = COLORS.byKey.array.randomSample(options.maxColors,
-                                                      rnd);
+        auto colors = COLORS.byKey.array.randomSample(options.maxColors)
+            .array;
         tiles = new Color[][](options.columns, options.rows);
-        each!(xy => tiles[xy[0]][xy[1]] = colors.array.choice(rnd))
+        each!(xy => tiles[xy[0]][xy[1]] = colors.choice)
              (allTilesRange);
         doDraw;
         onChangeState(score, state);
@@ -317,7 +313,7 @@ final class Board : DrawingArea {
         import std.array: array;
         import std.range: iota;
         import std.random: randomShuffle;
-        return iota(limit).array.randomShuffle(rnd);
+        return iota(limit).array.randomShuffle;
     }
 
     private bool moveIsPossible(const int x, const int y,
