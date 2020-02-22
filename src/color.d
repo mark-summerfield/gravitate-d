@@ -27,17 +27,17 @@ struct Color {
     }
 
     // least (0.0 1.0] most changed
-    Color darker(double luminosity=0.2) const {
+    Color darker(const double luminosity=0.2) const {
         return morphed(-luminosity);
     }
 
     // least (0.0 1.0] most changed
-    Color lighter(double luminosity=0.5) const {
+    Color lighter(const double luminosity=0.5) const {
         return morphed(luminosity);
     }
 
     // luminosity: lighten = (0.0 1.0]; darken = (0.0 -1.0]
-    private Color morphed(double luminosity) const {
+    private Color morphed(const double luminosity) const {
         assert(isValid());
         import std.conv: to;
         import std.math: fmax, fmin, round;

@@ -19,57 +19,56 @@ struct Config {
 
     int maxColors() const { return _maxColors; }
 
-    void maxColors(int maxColors, int low=2,
-                   int high=COLORS.length.to!int) {
-        _maxColors = clamp(maxColors, low, high);
+    void maxColors(const int maxColors) {
+        _maxColors = clamp(maxColors, 2, COLORS.length.to!int);
     }
 
     int columns() const { return _columns; }
 
-    void columns(int columns, int low=5, int high=30) {
-        _columns = clamp(columns, low, high);
+    void columns(const int columns) {
+        _columns = clamp(columns, MIN_SIZE, MAX_SIZE);
     }
 
     int rows() const { return _rows; }
 
-    void rows(int rows, int low=5, int high=30) {
-        _rows = clamp(rows, low, high);
+    void rows(const int rows) {
+        _rows = clamp(rows, MIN_SIZE, MAX_SIZE);
     }
 
     int delayMs() const { return _delayMs; }
 
-    void delayMs(int delayMs, int low=0, int high=1000) {
-        _delayMs = clamp(delayMs, low, high);
+    void delayMs(const int delayMs) {
+        _delayMs = clamp(delayMs, 0, 1000);
     }
 
     int highScore() const { return _highScore; }
 
-    void highScore(int highScore, int low=0, int high=int.max) {
-        _highScore = clamp(highScore, low, high);
+    void highScore(const int highScore) {
+        _highScore = clamp(highScore, 0, int.max);
     }
 
     int x() const { return _x; }
 
-    void x(int x) {
+    void x(const int x) {
         _x = x;
     }
 
     int y() const { return _y; }
 
-    void y(int y) {
+    void y(const int y) {
         _y = y;
     }
 
     int width() const { return _width; }
 
-    void width(int width, int low=200, int high=int.max) {
-        _width = clamp(width, low, high);
+    void width(const int width) {
+        _width = clamp(width, 200, 2000);
     }
 
     int height() const { return _height; }
 
-    void height(int height, int low=200, int high=int.max) {
-        _height = clamp(height, low, high);
+    void height(const int height) {
+        _height = clamp(height, 200, 2000);
     }
 
     private void load() {
@@ -83,19 +82,20 @@ struct Config {
             stderr.writeln("failed to load config");
             return;
         }
-        maxColors(getInt(keyFile, BOARD, MAXCOLORS, DEF_MAXCOLORS));
-        columns(getInt(keyFile, BOARD, COLUMNS, DEF_COLUMNS));
-        rows(getInt(keyFile, BOARD, ROWS, DEF_ROWS));
-        delayMs(getInt(keyFile, BOARD, DELAYMS, DEF_DELAYMS));
-        highScore(getInt(keyFile, BOARD, HIGHSCORE, DEF_HIGHSCORE));
-        x(getInt(keyFile, WINDOW, X, DEF_X));
-        y(getInt(keyFile, WINDOW, Y, DEF_Y));
-        width(getInt(keyFile, WINDOW, WIDTH, DEF_WIDTH));
-        height(getInt(keyFile, WINDOW, HEIGHT, DEF_HEIGHT));
+        maxColors(get(keyFile, BOARD, MAXCOLORS, DEF_MAXCOLORS));
+        columns(get(keyFile, BOARD, COLUMNS, DEF_COLUMNS));
+        rows(get(keyFile, BOARD, ROWS, DEF_ROWS));
+        delayMs(get(keyFile, BOARD, DELAYMS, DEF_DELAYMS));
+        highScore(get(keyFile, BOARD, HIGHSCORE, DEF_HIGHSCORE));
+        x(get(keyFile, WINDOW, X, DEF_X));
+        y(get(keyFile, WINDOW, Y, DEF_Y));
+        width(get(keyFile, WINDOW, WIDTH, DEF_WIDTH));
+        height(get(keyFile, WINDOW, HEIGHT, DEF_HEIGHT));
     }
 
-    private int getInt(ref KeyFile keyFile, string group, string key,
-                       int def) {
+    // Can easily overload by distingishing on the type of defaultValue
+    private int get(ref KeyFile keyFile, string group, string key,
+                    const int defaultValue) {
         auto value = keyFile.getValue(group, key);
         if (value !is null) {
             import std.conv: ConvException;
@@ -105,10 +105,10 @@ struct Config {
                 // ignore and return default
             }
         }
-        return def;
+        return defaultValue;
     }
 
-    void save() {
+    bool save() {
         assert(filename.length);
 
         import glib.KeyFile: KeyFile;
@@ -122,7 +122,7 @@ struct Config {
             } catch (FileException err) {
                 import std.stdio: stderr;
                 stderr.writefln("failed to create config path: %s", err);
-                return;
+                return false;
             }
         auto keyFile = new KeyFile;
         keyFile.setInteger(BOARD, MAXCOLORS, maxColors);
@@ -137,7 +137,9 @@ struct Config {
         if (!keyFile.saveToFile(filename)) {
             import std.stdio: stderr;
             stderr.writeln("failed to save config");
+            return false;
         }
+        return true;
     }
 
     private {
@@ -162,6 +164,9 @@ struct Config {
         enum DEF_Y = 0;
         enum DEF_WIDTH = 400;
         enum DEF_HEIGHT = 400;
+
+        enum MIN_SIZE = 5;
+        enum MAX_SIZE = 30;
 
         string filename;
         int _maxColors = DEF_MAXCOLORS;

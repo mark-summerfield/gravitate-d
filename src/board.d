@@ -109,7 +109,7 @@ final class Board : DrawingArea {
         }
     }
 
-    private Color.Pair colorPair(Color color) {
+    private Color.Pair colorPair(Color color) const {
         import color: COLORS;
 
         immutable plight = color in COLORS;
@@ -218,7 +218,7 @@ final class Board : DrawingArea {
             deleteAdjoining(adjoining); return false; }, false);
     }
 
-    private bool isLegal(const Point p, const Color color) {
+    private bool isLegal(const Point p, const Color color) const {
         immutable x = p.x;
         immutable y = p.y;
         if (x > 0 && color == tiles[x - 1][y])
@@ -366,7 +366,7 @@ final class Board : DrawingArea {
         return MovePoint(false, Point(x, y));
     }
 
-    bool isSquare(const Point p) {
+    bool isSquare(const Point p) const {
         immutable x = p.x;
         immutable y = p.y;
         if (x > 0 && tiles[x - 1][y].isValid)
