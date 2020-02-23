@@ -35,7 +35,7 @@ final class GameWindow : ApplicationWindow {
         makeBindings;
         addOnKeyPress(&onKeyPress);
         setDefaultSize(cfg.width, cfg.height);
-        if (cfg.x > 0 && cfg.y > 0)
+        if (cfg.xyIsValid)
             move(cfg.x, cfg.y);
         showAll;
         board.newGame;

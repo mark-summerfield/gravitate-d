@@ -59,6 +59,8 @@ struct Config {
         _y = y;
     }
 
+    bool xyIsValid() const { return _x > INVALID && _y > INVALID; }
+
     int width() const { return _width; }
 
     void width(const int width) {
@@ -87,20 +89,19 @@ struct Config {
         rows(get(keyFile, BOARD, ROWS, DEF_ROWS));
         delayMs(get(keyFile, BOARD, DELAYMS, DEF_DELAYMS));
         highScore(get(keyFile, BOARD, HIGHSCORE, DEF_HIGHSCORE));
-        x(get(keyFile, WINDOW, X, DEF_X));
-        y(get(keyFile, WINDOW, Y, DEF_Y));
+        x(get(keyFile, WINDOW, X, INVALID));
+        y(get(keyFile, WINDOW, Y, INVALID));
         width(get(keyFile, WINDOW, WIDTH, DEF_WIDTH));
         height(get(keyFile, WINDOW, HEIGHT, DEF_HEIGHT));
     }
 
-    // Can easily overload by distingishing on the type of defaultValue
-    private int get(ref KeyFile keyFile, string group, string key,
-                    const int defaultValue) {
+    private T get(T)(ref KeyFile keyFile, string group, string key,
+                     const T defaultValue) {
         auto value = keyFile.getValue(group, key);
         if (value !is null) {
             import std.conv: ConvException;
             try {
-                return value.to!int;
+                return value.to!T;
             } catch (ConvException) {
                 // ignore and return default
             }
@@ -160,11 +161,10 @@ struct Config {
         enum DEF_ROWS = 9;
         enum DEF_DELAYMS = 250;
         enum DEF_HIGHSCORE = 0;
-        enum DEF_X = 0;
-        enum DEF_Y = 0;
         enum DEF_WIDTH = 400;
         enum DEF_HEIGHT = 400;
 
+        enum INVALID = -1;
         enum MIN_SIZE = 5;
         enum MAX_SIZE = 30;
 
@@ -174,8 +174,8 @@ struct Config {
         int _rows = DEF_ROWS;
         int _delayMs = DEF_DELAYMS;
         int _highScore = DEF_HIGHSCORE;
-        int _x = DEF_X;
-        int _y = DEF_Y;
+        int _x = INVALID;
+        int _y = INVALID;
         int _width = DEF_WIDTH;
         int _height = DEF_HEIGHT;
     }

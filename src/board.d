@@ -7,6 +7,7 @@ final class Board : DrawingArea {
     import color: Color;
     import config: Config;
     import gdk.Event: Event;
+    import glib.c.types: GPriority;
     import gtk.Widget: Widget;
     import point: Point;
     import std.container.rbtree: RedBlackTree;
@@ -215,7 +216,8 @@ final class Board : DrawingArea {
         auto adjoining = dimAdjoining(p, color);
         queueDraw;
         new Timeout(cfg.delayMs, delegate bool() {
-            deleteAdjoining(adjoining); return false; }, false);
+            deleteAdjoining(adjoining); return false; },
+            GPriority.HIGH, false);
     }
 
     private bool isLegal(const Point p, const Color color) const {
@@ -267,7 +269,8 @@ final class Board : DrawingArea {
         each!(ap => tiles[ap.x][ap.y] = invalid)(adjoining);
         queueDraw;
         new Timeout(cfg.delayMs, delegate bool() {
-            closeTilesUp(adjoining.length); return false; }, false);
+            closeTilesUp(adjoining.length); return false; },
+            GPriority.HIGH, false);
     }
 
     private void closeTilesUp(const size_t count) {
@@ -284,8 +287,8 @@ final class Board : DrawingArea {
         }
         score += (round(sqrt(cfg.columns * cfg.rows.to!double)) +
                   pow(count, cfg.maxColors / 2)).to!int;
-        queueDraw;
         checkGameOver;
+        queueDraw;
         onChangeState(score, state);
     }
 
