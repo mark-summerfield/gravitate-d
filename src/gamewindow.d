@@ -4,7 +4,7 @@ import gtk.ApplicationWindow: ApplicationWindow;
 
 final class GameWindow : ApplicationWindow {
     import board: Board;
-    import config: Config;
+    import config: config;
     import gdk.Event: Event;
     import gtk.Application: Application;
     import gtk.Label: Label;
@@ -20,23 +20,21 @@ final class GameWindow : ApplicationWindow {
         Board board;
         Label statusLabel;
         bool terminating;
-        Config cfg;
     }
 
     this(Application application) {
         import common: APPNAME, ICON;
 
         super(application);
-        cfg = Config(application.getApplicationId);
         setTitle(APPNAME);
         setIconFromFile(ICON); // TODO embed or SVG
         makeWidgets;
         makeLayout;
         makeBindings;
         addOnKeyPress(&onKeyPress);
-        setDefaultSize(cfg.width, cfg.height);
-        if (cfg.xyIsValid)
-            move(cfg.x, cfg.y);
+        setDefaultSize(config.width, config.height);
+        if (config.xyIsValid)
+            move(config.x, config.y);
         showAll;
         board.newGame;
     }
@@ -56,7 +54,7 @@ final class GameWindow : ApplicationWindow {
         aboutButton.setTooltipMarkup("About <b>a</b>");
         quitButton = new ToolButton(StockID.QUIT);
         quitButton.setTooltipMarkup("Quit <b>q</b> <i>or</i> <b>Esc</b>");
-        board = new Board(cfg, &onChangeState);
+        board = new Board(&onChangeState);
         statusLabel = new Label("0/0");
     }
 
@@ -160,12 +158,12 @@ final class GameWindow : ApplicationWindow {
         int a;
         int b;
         getSize(a, b);
-        cfg.width(a);
-        cfg.height(b);
+        config.width = a;
+        config.height = b;
         getPosition(a, b);
-        cfg.x(a);
-        cfg.y(b);
-        cfg.save;
+        config.x = a;
+        config.y = b;
+        config.save;
         destroy;
     }
 
@@ -176,14 +174,14 @@ final class GameWindow : ApplicationWindow {
         if (state == Board.State.GAME_OVER)
             message = format("%,d Game Over", score);
         else if (state == Board.State.USER_WON) {
-            if (score > cfg.highScore) {
+            if (score > config.highScore) {
                 message = format("%,d New High Score!", score);
-                cfg.highScore(score);
-                cfg.save;
+                config.highScore = score;
+                config.save;
             } else
                 message = format("%,d You Won!", score);
         } else // still playing
-            message = format("%,d/%,d", score, cfg.highScore);
+            message = format("%,d/%,d", score, config.highScore);
 	    statusLabel.setText(message);
     }
 }

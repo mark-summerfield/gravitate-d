@@ -1,83 +1,80 @@
 // Copyright © 2020 Mark Summerfield. All rights reserved.
 
-struct Config {
-    import color: COLORS;
+static Config config; // Must call config.load(applicationId) before use
+
+private struct Config {
     import glib.KeyFile: KeyFile;
     import std.algorithm: clamp;
-    import std.conv: to;
 
-    this(string applicationId) {
+    int maxColors() const { return m.maxColors; }
+
+    void maxColors(const int maxColors) {
+        import color: COLORS;
+        import std.conv: to;
+
+        m.maxColors = clamp(maxColors, 2, COLORS.length.to!int);
+    }
+
+    int columns() const { return m.columns; }
+
+    void columns(const int columns) {
+        m.columns = clamp(columns, MIN_SIZE, MAX_SIZE);
+    }
+
+    int rows() const { return m.rows; }
+
+    void rows(const int rows) {
+        m.rows = clamp(rows, MIN_SIZE, MAX_SIZE);
+    }
+
+    int delayMs() const { return m.delayMs; }
+
+    void delayMs(const int delayMs) {
+        m.delayMs = clamp(delayMs, 0, 1000);
+    }
+
+    int highScore() const { return m.highScore; }
+
+    void highScore(const int highScore) {
+        m.highScore = clamp(highScore, 0, int.max);
+    }
+
+    int x() const { return m.x; }
+
+    void x(const int x) {
+        m.x = x;
+    }
+
+    int y() const { return m.y; }
+
+    void y(const int y) {
+        m.y = y;
+    }
+
+    bool xyIsValid() const { return m.x > INVALID && m.y > INVALID; }
+
+    int width() const { return m.width; }
+
+    void width(const int width) {
+        m.width = clamp(width, 200, 2000);
+    }
+
+    int height() const { return m.height; }
+
+    void height(const int height) {
+        m.height = clamp(height, 200, 2000);
+    }
+
+    // Must be called before use of static
+    void load(string applicationId) {
         import glib.Util: gutil = Util;
+        import glib.c.types: GKeyFileFlags;
         import std.array: replace;
         import std.path: buildPath, dirSeparator;
 
         filename = buildPath(gutil.getUserConfigDir,
                              applicationId.replace('.',
                                                    dirSeparator) ~ ".ini");
-        load();
-    }
-
-    int maxColors() const { return _maxColors; }
-
-    void maxColors(const int maxColors) {
-        _maxColors = clamp(maxColors, 2, COLORS.length.to!int);
-    }
-
-    int columns() const { return _columns; }
-
-    void columns(const int columns) {
-        _columns = clamp(columns, MIN_SIZE, MAX_SIZE);
-    }
-
-    int rows() const { return _rows; }
-
-    void rows(const int rows) {
-        _rows = clamp(rows, MIN_SIZE, MAX_SIZE);
-    }
-
-    int delayMs() const { return _delayMs; }
-
-    void delayMs(const int delayMs) {
-        _delayMs = clamp(delayMs, 0, 1000);
-    }
-
-    int highScore() const { return _highScore; }
-
-    void highScore(const int highScore) {
-        _highScore = clamp(highScore, 0, int.max);
-    }
-
-    int x() const { return _x; }
-
-    void x(const int x) {
-        _x = x;
-    }
-
-    int y() const { return _y; }
-
-    void y(const int y) {
-        _y = y;
-    }
-
-    bool xyIsValid() const { return _x > INVALID && _y > INVALID; }
-
-    int width() const { return _width; }
-
-    void width(const int width) {
-        _width = clamp(width, 200, 2000);
-    }
-
-    int height() const { return _height; }
-
-    void height(const int height) {
-        _height = clamp(height, 200, 2000);
-    }
-
-    private void load() {
-        assert(filename.length);
-
-        import glib.c.types: GKeyFileFlags;
-
         auto keyFile = new KeyFile;
         if (!keyFile.loadFromFile(filename, GKeyFileFlags.KEEP_COMMENTS)) {
             import std.stdio: stderr;
@@ -99,7 +96,7 @@ struct Config {
                      const T defaultValue) {
         auto value = keyFile.getValue(group, key);
         if (value !is null) {
-            import std.conv: ConvException;
+            import std.conv: ConvException, to;
             try {
                 return value.to!T;
             } catch (ConvException) {
@@ -112,7 +109,6 @@ struct Config {
     bool save() {
         assert(filename.length);
 
-        import glib.KeyFile: KeyFile;
         import std.file: exists, FileException, mkdirRecurse;
         import std.path: dirName;
 
@@ -169,14 +165,18 @@ struct Config {
         enum MAX_SIZE = 30;
 
         string filename;
-        int _maxColors = DEF_MAXCOLORS;
-        int _columns = DEF_COLUMNS;
-        int _rows = DEF_ROWS;
-        int _delayMs = DEF_DELAYMS;
-        int _highScore = DEF_HIGHSCORE;
-        int _x = INVALID;
-        int _y = INVALID;
-        int _width = DEF_WIDTH;
-        int _height = DEF_HEIGHT;
+
+        struct M {
+            int maxColors = DEF_MAXCOLORS;
+            int columns = DEF_COLUMNS;
+            int rows = DEF_ROWS;
+            int delayMs = DEF_DELAYMS;
+            int highScore = DEF_HIGHSCORE;
+            int x = INVALID;
+            int y = INVALID;
+            int width = DEF_WIDTH;
+            int height = DEF_HEIGHT;
+        }
+        M m;
     }
 }

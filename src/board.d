@@ -5,7 +5,7 @@ import gtk.DrawingArea: DrawingArea;
 final class Board : DrawingArea {
     import cairo.Context: Context, Scoped;
     import color: Color;
-    import config: Config;
+    import config: config;
     import gdk.Event: Event;
     import glib.c.types: GPriority;
     import gtk.Widget: Widget;
@@ -28,11 +28,9 @@ final class Board : DrawingArea {
         int score;
         Point selected;
         Color[][] tiles;
-        Config cfg;
     }
 
-    this(ref Config cfg, OnChangeStateFn onChangeState) {
-        this.cfg = cfg;
+    this(OnChangeStateFn onChangeState) {
         this.onChangeState = onChangeState;
         setSizeRequest(150, 150); // Minimum size
         addOnDraw(&onDraw);
@@ -49,9 +47,9 @@ final class Board : DrawingArea {
         state = State.PLAYING;
         score = 0;
         selected.clear();
-        auto colors = COLORS.byKey.array.randomSample(cfg.maxColors)
+        auto colors = COLORS.byKey.array.randomSample(config.maxColors)
             .array;
-        tiles = new Color[][](cfg.columns, cfg.rows);
+        tiles = new Color[][](config.columns, config.rows);
         each!(xy => tiles[xy[0]][xy[1]] = colors.choice)
              (allTilesRange);
         queueDraw;
@@ -61,7 +59,7 @@ final class Board : DrawingArea {
     private auto allTilesRange() {
         import std.algorithm: cartesianProduct;
         import std.range: iota;
-        return cartesianProduct(iota(cfg.columns), iota(cfg.rows));
+        return cartesianProduct(iota(config.columns), iota(config.rows));
     }
 
     private bool onDraw(Scoped!Context context, Widget) {
@@ -77,8 +75,8 @@ final class Board : DrawingArea {
     }
 
     private Size tileSize() {
-        return Size(getAllocatedWidth / cfg.columns,
-                    getAllocatedHeight / cfg.rows);
+        return Size(getAllocatedWidth / config.columns,
+                    getAllocatedHeight / config.rows);
     }
 
     private void drawTile(ref Scoped!Context context, const int x,
@@ -182,8 +180,8 @@ final class Board : DrawingArea {
         if (state != State.PLAYING)
             return;
         if (!selected.isValid) {
-            selected.x = cfg.columns / 2;
-            selected.y = cfg.rows / 2;
+            selected.x = config.columns / 2;
+            selected.y = config.rows / 2;
         } else {
             int x = selected.x;
             int y = selected.y;
@@ -193,7 +191,7 @@ final class Board : DrawingArea {
             case Direction.UP: y--; break;
             case Direction.DOWN: y++; break;
             }
-            if (0 <= x && x < cfg.columns && 0 <= y && y < cfg.rows
+            if (0 <= x && x < config.columns && 0 <= y && y < config.rows
                     && tiles[x][y].isValid) {
                 selected.x = x;
                 selected.y = y;
@@ -215,7 +213,7 @@ final class Board : DrawingArea {
             return;
         auto adjoining = dimAdjoining(p, color);
         queueDraw;
-        new Timeout(cfg.delayMs, delegate bool() {
+        new Timeout(config.delayMs, delegate bool() {
             deleteAdjoining(adjoining); return false; },
             GPriority.HIGH, false);
     }
@@ -225,11 +223,11 @@ final class Board : DrawingArea {
         immutable y = p.y;
         if (x > 0 && color == tiles[x - 1][y])
             return true;
-        if (x + 1 < cfg.columns && color == tiles[x + 1][y])
+        if (x + 1 < config.columns && color == tiles[x + 1][y])
             return true;
         if (y > 0 && color == tiles[x][y - 1])
             return true;
-        if (y + 1 < cfg.rows && color == tiles[x][y + 1])
+        if (y + 1 < config.rows && color == tiles[x][y + 1])
             return true;
         return false;
     }
@@ -249,7 +247,7 @@ final class Board : DrawingArea {
                                    ref PointSet adjoining) {
         immutable x = p.x;
         immutable y = p.y;
-        if (!(0 <= x && x < cfg.columns && 0 <= y && y < cfg.rows))
+        if (!(0 <= x && x < config.columns && 0 <= y && y < config.rows))
             return; // Fallen off an edge
         if (p in adjoining || tiles[x][y] != color)
             return; // Color doesn't match or already done
@@ -268,12 +266,13 @@ final class Board : DrawingArea {
         auto invalid = Color();
         each!(ap => tiles[ap.x][ap.y] = invalid)(adjoining);
         queueDraw;
-        new Timeout(cfg.delayMs, delegate bool() {
+        new Timeout(config.delayMs, delegate bool() {
             closeTilesUp(adjoining.length); return false; },
             GPriority.HIGH, false);
     }
 
     private void closeTilesUp(const size_t count) {
+        import glib.Timeout: Timeout;
         import std.conv: to;
         import std.math: pow, round, sqrt;
 
@@ -281,15 +280,16 @@ final class Board : DrawingArea {
         moveTiles;
         if (selected.isValid) {
             if (!tiles[selected.x][selected.y].isValid) {
-                selected.x = cfg.columns / 2;
-                selected.y = cfg.rows / 2;
+                selected.x = config.columns / 2;
+                selected.y = config.rows / 2;
             }
         }
-        score += (round(sqrt(cfg.columns * cfg.rows.to!double)) +
-                  pow(count, cfg.maxColors / 2)).to!int;
+        score += (round(sqrt(config.columns * config.rows.to!double)) +
+                  pow(count, config.maxColors / 2)).to!int;
         checkGameOver;
-        queueDraw;
         onChangeState(score, state);
+        new Timeout(config.delayMs, delegate bool() {
+            queueDraw; return false; }, GPriority.HIGH, false);
     }
 
     private void moveTiles() {
@@ -297,8 +297,8 @@ final class Board : DrawingArea {
         PointMap moves;
         while (moved) {
             moved = false;
-            foreach (x; rippleRange(cfg.columns))
-                foreach (y; rippleRange(cfg.rows))
+            foreach (x; rippleRange(config.columns))
+                foreach (y; rippleRange(config.rows))
                     if (tiles[x][y].isValid)
                         if (moveIsPossible(x, y, moves)) {
                             moved = true;
@@ -338,8 +338,8 @@ final class Board : DrawingArea {
         auto neighbours = new PointSet;
         foreach (p; [Point(x - 1, y), Point(x + 1, y), Point(x, y - 1),
                      Point(x, y + 1)])
-            if (0 <= p.x && p.x < cfg.columns && 0 <= p.y &&
-                    p.y < cfg.rows && !tiles[p.x][p.y].isValid)
+            if (0 <= p.x && p.x < config.columns && 0 <= p.y &&
+                    p.y < config.rows && !tiles[p.x][p.y].isValid)
                 neighbours.insert(p);
         return neighbours;
     }
@@ -349,8 +349,8 @@ final class Board : DrawingArea {
         import std.math: hypot, isNaN;
 
         immutable color = tiles[x][y];
-        immutable midx = cfg.columns / 2;
-        immutable midy = cfg.rows / 2;
+        immutable midx = config.columns / 2;
+        immutable midy = config.rows / 2;
         immutable oldRadius = hypot(midx - x, midy - y);
         double shortestRadius;
         Point rp;
@@ -374,11 +374,11 @@ final class Board : DrawingArea {
         immutable y = p.y;
         if (x > 0 && tiles[x - 1][y].isValid)
             return true;
-        if (x + 1 < cfg.columns && tiles[x + 1][y].isValid)
+        if (x + 1 < config.columns && tiles[x + 1][y].isValid)
             return true;
         if (y > 0 && tiles[x][y - 1].isValid)
             return true;
-        if (y + 1 < cfg.rows && tiles[x][y + 1].isValid)
+        if (y + 1 < config.rows && tiles[x][y + 1].isValid)
             return true;
         return false;
     }
@@ -401,7 +401,8 @@ final class Board : DrawingArea {
         }
 
         each!(xy => check(xy[0], xy[1]))(allTilesRange);
-        canMove = !any!(a => a == 1)(countForColor.byValue);
+        if (any!(a => a == 1)(countForColor.byValue))
+            canMove = false;
 
         if (userWon)
             state = State.USER_WON;
