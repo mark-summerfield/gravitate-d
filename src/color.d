@@ -22,7 +22,7 @@ struct Color {
     }
 
     Rgb toRgb() const {
-        assert(isValid());
+        assert(isValid);
         return Rgb(red / 255.0, green / 255.0, blue / 255.0);
     }
 
@@ -38,7 +38,7 @@ struct Color {
 
     // luminosity: lighten = (0.0 1.0]; darken = (0.0 -1.0]
     private Color morphed(const double luminosity) const {
-        assert(isValid());
+        assert(isValid);
         import std.conv: to;
         import std.math: fmax, fmin, round;
 

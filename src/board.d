@@ -46,7 +46,7 @@ final class Board : DrawingArea {
 
         state = State.PLAYING;
         score = 0;
-        selected.clear();
+        selected.clear;
         auto colors = COLORS.byKey.array.randomSample(config.maxColors)
             .array;
         tiles = new Color[][](config.columns, config.rows);
@@ -136,10 +136,13 @@ final class Board : DrawingArea {
 
     private void drawSegment(ref Scoped!Context context, const Color color,
                              const int[] points) {
+        import std.algorithm: each;
+        import std.range: iota;
+
         context.newPath;
         context.moveTo(points[0], points[1]);
-        for (int i = 2; i < points.length; i += 2)
-            context.lineTo(points[i], points[i + 1]);
+        each!(i => context.lineTo(points[i], points[i + 1]))
+             (iota(0, points.length, 2));
         context.closePath;
         context.setSourceRgb(color.toRgb.expand);
         context.fill;
@@ -164,7 +167,7 @@ final class Board : DrawingArea {
             import std.conv: to;
             import std.math: floor;
 
-            auto size = tileSize;
+            immutable size = tileSize;
             double eventX;
             double eventY;
             event.getCoords(eventX, eventY);
@@ -209,10 +212,10 @@ final class Board : DrawingArea {
     private void deleteTiles(const Point p) {
         import glib.Timeout: Timeout;
 
-        auto color = tiles[p.x][p.y];
+        immutable color = tiles[p.x][p.y];
         if (!color.isValid || !isLegal(p, color))
             return;
-        auto adjoining = dimAdjoining(p, color);
+        const adjoining = dimAdjoining(p, color);
         queueDraw;
         new Timeout(config.delayMs, delegate bool() {
             deleteAdjoining(adjoining); return false; },
@@ -264,7 +267,7 @@ final class Board : DrawingArea {
         import std.algorithm: each;
 
         queueDraw;
-        auto invalid = Color();
+        immutable invalid = Color();
         each!(ap => tiles[ap.x][ap.y] = invalid)(adjoining);
         queueDraw;
         new Timeout(config.delayMs, delegate bool() {
@@ -300,11 +303,11 @@ final class Board : DrawingArea {
             moved = false;
             foreach (x; rippleRange(config.columns))
                 foreach (y; rippleRange(config.rows))
-                    if (tiles[x][y].isValid)
-                        if (moveIsPossible(x, y, moves)) {
-                            moved = true;
-                            break;
-                        }
+                    if (tiles[x][y].isValid &&
+                            moveIsPossible(x, y, moves)) {
+                        moved = true;
+                        break;
+                    }
         }
     }
 
@@ -347,6 +350,7 @@ final class Board : DrawingArea {
 
     private MovePoint nearestToMiddle(const int x, const int y,
                                       const PointSet empties) {
+        import std.algorithm: each;
         import std.math: hypot, isNaN;
 
         immutable color = tiles[x][y];
@@ -355,7 +359,8 @@ final class Board : DrawingArea {
         immutable oldRadius = hypot(midx - x, midy - y);
         double shortestRadius;
         Point rp;
-        foreach (p; empties)
+
+        void findNearest(const Point p) {
             if (isSquare(p)) {
                 auto newRadius = hypot(midx - p.x, midy - p.y);
                 if (isLegal(p, color))
@@ -365,6 +370,9 @@ final class Board : DrawingArea {
                     rp = p;
                 }
             }
+        }
+
+        each!(p => findNearest(p))(empties);
         if (!isNaN(shortestRadius) && oldRadius > shortestRadius)
             return MovePoint(true, rp);
         return MovePoint(false, Point(x, y));

@@ -62,22 +62,22 @@ final class GameWindow : ApplicationWindow {
         import gtk.Box: Box;
         import gtkc.gtktypes: GtkOrientation;
 
-        enum pad = 1;
+        enum Pad = 1;
         enum: bool {Expand = true, Fill = true,
                     NoExpand = false, NoFill = false}
-        auto leftBox = new Box(GtkOrientation.HORIZONTAL, pad);
+        auto leftBox = new Box(GtkOrientation.HORIZONTAL, Pad);
         leftBox.setHomogeneous(true);
-        leftBox.packStart(newButton, NoExpand, Fill, pad);
-        leftBox.packStart(optionsButton, NoExpand, Fill, pad);
-        leftBox.packStart(helpButton, NoExpand, Fill, pad);
-        leftBox.packStart(aboutButton, NoExpand, Fill, pad);
-        auto hbox = new Box(GtkOrientation.HORIZONTAL, pad);
-        hbox.packStart(leftBox, NoExpand, NoFill, pad);
-        hbox.packEnd(quitButton, NoExpand, Fill, pad);
-        auto vbox = new Box(GtkOrientation.VERTICAL, pad);
-        vbox.packStart(hbox, NoExpand, Fill, pad);
-        vbox.packStart(board, Expand, Fill, pad);
-        vbox.packEnd(statusLabel, NoExpand, Fill, pad);
+        leftBox.packStart(newButton, NoExpand, Fill, Pad);
+        leftBox.packStart(optionsButton, NoExpand, Fill, Pad);
+        leftBox.packStart(helpButton, NoExpand, Fill, Pad);
+        leftBox.packStart(aboutButton, NoExpand, Fill, Pad);
+        auto hbox = new Box(GtkOrientation.HORIZONTAL, Pad);
+        hbox.packStart(leftBox, NoExpand, NoFill, Pad);
+        hbox.packEnd(quitButton, NoExpand, Fill, Pad);
+        auto vbox = new Box(GtkOrientation.VERTICAL, Pad);
+        vbox.packStart(hbox, NoExpand, Fill, Pad);
+        vbox.packStart(board, Expand, Fill, Pad);
+        vbox.packEnd(statusLabel, NoExpand, Fill, Pad);
         add(vbox);
     }
 
@@ -170,18 +170,17 @@ final class GameWindow : ApplicationWindow {
     private void onChangeState(int score, Board.State state) {
         import std.format: format;
 
-        string message;
+        auto message = format("%,d/%,d ", score, config.highScore);
         if (state == Board.State.GAME_OVER)
-            message = format("%,d Game Over", score);
+            message ~= "Game Over";
         else if (state == Board.State.USER_WON) {
             if (score > config.highScore) {
-                message = format("%,d New High Score!", score);
+                message ~= "New High Score!";
                 config.highScore = score;
                 config.save;
             } else
-                message = format("%,d You Won!", score);
-        } else // still playing
-            message = format("%,d/%,d", score, config.highScore);
+                message ~= "You Won!";
+        }
 	    statusLabel.setText(message);
     }
 }

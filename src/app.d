@@ -1,4 +1,3 @@
-#!/usr/bin/env dub
 // Copyright © 2020 Mark Summerfield. All rights reserved.
 
 int main(string[] args) {
