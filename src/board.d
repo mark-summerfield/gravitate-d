@@ -163,6 +163,7 @@ final class Board : DrawingArea {
     }
 
     private bool onMouseButtonPress(Event event, Widget) {
+        queueDraw; // Force redraw since sometimes Gtk "forgets" to
         if (state == State.PLAYING) {
             import std.conv: to;
             import std.math: floor;
@@ -174,7 +175,6 @@ final class Board : DrawingArea {
             immutable x = floor(eventX / size.width).to!int;
             immutable y = floor(eventY / size.height).to!int;
             selected.clear;
-            queueDraw;
             deleteTiles(Point(x, y));
         }
         return true;
