@@ -171,6 +171,7 @@ final class Board : DrawingArea {
             immutable x = floor(eventX / size.width).to!int;
             immutable y = floor(eventY / size.height).to!int;
             selected.clear;
+            queueDraw;
             deleteTiles(Point(x, y));
         }
         return true;
