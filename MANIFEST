@@ -10,5 +10,7 @@ src/color.d
 src/common.d
 src/icons.d
 
+README.md
+
 dub.json
 st.sh
