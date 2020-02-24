@@ -243,7 +243,6 @@ final class Board : DrawingArea {
         populateAdjoining(p, color, adjoining);
         each!(ap => tiles[ap.x][ap.y] = tiles[ap.x][ap.y].darker)
              (adjoining);
-        queueDraw;
         return adjoining;
     }
 
@@ -269,7 +268,6 @@ final class Board : DrawingArea {
         queueDraw;
         immutable invalid = Color();
         each!(ap => tiles[ap.x][ap.y] = invalid)(adjoining);
-        queueDraw;
         new Timeout(config.delayMs, delegate bool() {
             closeTilesUp(adjoining.length); return false; },
             GPriority.HIGH, false);
@@ -350,7 +348,6 @@ final class Board : DrawingArea {
 
     private MovePoint nearestToMiddle(const int x, const int y,
                                       const PointSet empties) {
-        import std.algorithm: each;
         import std.math: hypot, isNaN;
 
         immutable color = tiles[x][y];
@@ -359,8 +356,7 @@ final class Board : DrawingArea {
         immutable oldRadius = hypot(midx - x, midy - y);
         double shortestRadius;
         Point rp;
-
-        void findNearest(const Point p) {
+        foreach (p; empties) {
             if (isSquare(p)) {
                 auto newRadius = hypot(midx - p.x, midy - p.y);
                 if (isLegal(p, color))
@@ -371,8 +367,6 @@ final class Board : DrawingArea {
                 }
             }
         }
-
-        each!(p => findNearest(p))(empties);
         if (!isNaN(shortestRadius) && oldRadius > shortestRadius)
             return MovePoint(true, rp);
         return MovePoint(false, Point(x, y));
