@@ -10,9 +10,9 @@ final class HelpForm: Window {
 
     private TextView view;
 
-    this(Window window) {
+    this(Window parent) {
         super("Help — " ~ APPNAME);
-        setTransientFor(window);
+        setTransientFor(parent);
         setDefaultSize(400, 400);
         makeView();
         populateView();

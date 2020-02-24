@@ -138,8 +138,8 @@ final class GameWindow: ApplicationWindow {
     }
 
     private void onOptions(ToolButton) {
-        import std.stdio: writeln;
-        writeln("onOptions"); // TODO
+        import optionsform: OptionsForm;
+        new OptionsForm(this);
     }
 
     private void onHelp(ToolButton) {
