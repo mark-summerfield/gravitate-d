@@ -1,5 +1,3 @@
-# TODO: Options
-
 src/app.d
 src/gamewindow.d
 src/board.d
@@ -14,5 +12,4 @@ src/common.d
 dub.json
 st.sh
 
-# TODO SVG icons?
 # vim: syn=yaml

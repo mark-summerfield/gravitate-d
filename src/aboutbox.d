@@ -20,7 +20,7 @@ void about(GameWindow parent) {
     scope(exit) about.destroy;
     about.setProgramName(APPNAME);
     about.setVersion(VERSION);
-    auto icon = new Pixbuf(ICON); // TODO embed or SVG
+    auto icon = new Pixbuf(ICON); // TODO embed
     about.setLogo(icon);
     about.setAuthors(["Mark Summerfield"]);
     about.setComments(

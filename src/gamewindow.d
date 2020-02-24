@@ -26,7 +26,7 @@ final class GameWindow: ApplicationWindow {
 
         super(application);
         setTitle(APPNAME);
-        setIconFromFile(ICON); // TODO embed or SVG
+        setIconFromFile(ICON); // TODO embed
         makeWidgets;
         makeLayout;
         makeBindings;
