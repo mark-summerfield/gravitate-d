@@ -19,7 +19,6 @@ final class GameWindow: ApplicationWindow {
         ToolButton quitButton;
         Board board;
         Label statusLabel;
-        bool terminating;
     }
 
     this(Application application) {
@@ -154,9 +153,6 @@ final class GameWindow: ApplicationWindow {
     }
 
     private void onQuit(Widget) {
-        if (terminating)
-            return;
-        terminating = true;
         int a;
         int b;
         getSize(a, b);
