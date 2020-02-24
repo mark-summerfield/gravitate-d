@@ -2,6 +2,14 @@
 
 static Config config; // Must call config.load(applicationId) before use
 
+enum MIN_BOARD_SIZE = 5;
+enum MAX_BOARD_SIZE = 30;
+enum MIN_COLORS = 2;
+enum MIN_DELAY = 0;
+enum MAX_DELAY = 1000;
+enum MIN_WINDOW_SIZE = 200;
+enum MAX_WINDOW_SIZE = 2000;
+
 private struct Config {
     import glib.KeyFile: KeyFile;
     import std.algorithm: clamp;
@@ -12,25 +20,25 @@ private struct Config {
         import color: COLORS;
         import std.conv: to;
 
-        m.maxColors = clamp(maxColors, 2, COLORS.length.to!int);
+        m.maxColors = clamp(maxColors, MIN_COLORS, COLORS.length.to!int);
     }
 
     int columns() const { return m.columns; }
 
     void columns(const int columns) {
-        m.columns = clamp(columns, MIN_SIZE, MAX_SIZE);
+        m.columns = clamp(columns, MIN_BOARD_SIZE, MAX_BOARD_SIZE);
     }
 
     int rows() const { return m.rows; }
 
     void rows(const int rows) {
-        m.rows = clamp(rows, MIN_SIZE, MAX_SIZE);
+        m.rows = clamp(rows, MIN_BOARD_SIZE, MAX_BOARD_SIZE);
     }
 
     int delayMs() const { return m.delayMs; }
 
     void delayMs(const int delayMs) {
-        m.delayMs = clamp(delayMs, 0, 1000);
+        m.delayMs = clamp(delayMs, MIN_DELAY, MAX_DELAY);
     }
 
     int highScore() const { return m.highScore; }
@@ -56,13 +64,13 @@ private struct Config {
     int width() const { return m.width; }
 
     void width(const int width) {
-        m.width = clamp(width, 200, 2000);
+        m.width = clamp(width, MIN_WINDOW_SIZE, MAX_WINDOW_SIZE);
     }
 
     int height() const { return m.height; }
 
     void height(const int height) {
-        m.height = clamp(height, 200, 2000);
+        m.height = clamp(height, MIN_WINDOW_SIZE, MAX_WINDOW_SIZE);
     }
 
     // Must be called before use of static
@@ -161,8 +169,6 @@ private struct Config {
         enum DEF_HEIGHT = 400;
 
         enum INVALID = -1;
-        enum MIN_SIZE = 5;
-        enum MAX_SIZE = 30;
 
         string filename;
 

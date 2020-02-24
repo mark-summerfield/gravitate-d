@@ -139,7 +139,7 @@ final class GameWindow: ApplicationWindow {
 
     private void onOptions(ToolButton) {
         import optionsform: OptionsForm;
-        new OptionsForm(this);
+        new OptionsForm(&onNew, this);
     }
 
     private void onHelp(ToolButton) {
