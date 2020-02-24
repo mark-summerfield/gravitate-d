@@ -75,6 +75,7 @@ private struct Config {
 
     // Must be called before use of static
     void load(string applicationId) {
+        import glib.GException: GException;
         import glib.Util: gutil = Util;
         import glib.c.types: GKeyFileFlags;
         import std.array: replace;
@@ -84,7 +85,14 @@ private struct Config {
                              applicationId.replace('.',
                                                    dirSeparator) ~ ".ini");
         auto keyFile = new KeyFile;
-        if (!keyFile.loadFromFile(filename, GKeyFileFlags.KEEP_COMMENTS)) {
+        bool ok;
+        try {
+            ok = keyFile.loadFromFile(filename,
+                                      GKeyFileFlags.KEEP_COMMENTS);
+        } catch (GException) {
+            ok = false;
+        }
+        if (!ok) {
             import std.stdio: stderr;
             stderr.writeln("failed to load config");
             return;
