@@ -22,11 +22,13 @@ final class GameWindow: ApplicationWindow {
     }
 
     this(Application application) {
-        import common: APPNAME, ICON;
+        import common: APPNAME;
+        import gdk.Pixbuf: Pixbuf;
+        import icons: ICON_XPM;
 
         super(application);
         setTitle(APPNAME);
-        setIconFromFile(ICON); // TODO embed
+        setDefaultIcon(new Pixbuf(ICON_XPM));
         makeWidgets;
         makeLayout;
         makeBindings;

@@ -8,8 +8,7 @@ src/config.d
 src/point.d
 src/color.d
 src/common.d
+src/icons.d
 
 dub.json
 st.sh
-
-# vim: syn=yaml

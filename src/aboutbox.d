@@ -3,7 +3,8 @@
 import gamewindow: GameWindow;
 
 void about(GameWindow parent) {
-    import common: APPNAME, VERSION, ICON;
+    import common: APPNAME, VERSION;
+    import icons: ICON_XPM;
     import std.compiler: compiler = name, version_major, version_minor;
     import std.conv: to;
     import std.datetime.systime: Clock;
@@ -20,8 +21,7 @@ void about(GameWindow parent) {
     scope(exit) about.destroy;
     about.setProgramName(APPNAME);
     about.setVersion(VERSION);
-    auto icon = new Pixbuf(ICON); // TODO embed
-    about.setLogo(icon);
+    about.setLogo(new Pixbuf(ICON_XPM));
     about.setAuthors(["Mark Summerfield"]);
     about.setComments(
         "A SameGame/TileFall-like game.\n\n" ~ format(
