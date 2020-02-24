@@ -6,7 +6,7 @@ A SameGame/TileFall-like game written in D/GtkD.
 
 The file `gravitate-win64.zip` contains a 64-bit Windows binary and this
 `README.md` file.
-Just unzip it somewhere convenient and double-click gravitate.exe to run.
+Just unzip it somewhere convenient and double-click `gravitate.exe` to run.
 
 ## Build
 
