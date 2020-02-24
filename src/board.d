@@ -2,7 +2,7 @@
 
 import gtk.DrawingArea: DrawingArea;
 
-final class Board : DrawingArea {
+final class Board: DrawingArea {
     import cairo.Context: Context, Scoped;
     import color: Color;
     import config: config;

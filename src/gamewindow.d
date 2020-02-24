@@ -2,7 +2,7 @@
 
 import gtk.ApplicationWindow: ApplicationWindow;
 
-final class GameWindow : ApplicationWindow {
+final class GameWindow: ApplicationWindow {
     import board: Board;
     import config: config;
     import gdk.Event: Event;
@@ -86,13 +86,15 @@ final class GameWindow : ApplicationWindow {
         optionsButton.addOnClicked(&onOptions);
         helpButton.addOnClicked(&onHelp);
         aboutButton.addOnClicked(&onAbout);
-        quitButton.addOnClicked(delegate void(ToolButton) { close; });
-        addOnDestroy(&onQuit);
+        quitButton.addOnClicked(
+            delegate void(ToolButton) { onQuit(null); });
+        addOnDelete(
+            delegate bool(Event, Widget) { onQuit(null); return false; });
     }
 
     // These are application-global since we don't want a notion of focus
     private bool onKeyPress(Event event, Widget) {
-        import gdk.Keymap : Keymap;
+        import gdk.Keymap: Keymap;
 
         uint kv;
         event.getKeyval(kv);
@@ -142,8 +144,8 @@ final class GameWindow : ApplicationWindow {
     }
 
     private void onHelp(ToolButton) {
-        import std.stdio: writeln;
-        writeln("onHelp"); // TODO
+        import helpform: HelpForm;
+        new HelpForm(this);
     }
 
     private void onAbout(ToolButton) {

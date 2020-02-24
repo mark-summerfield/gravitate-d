@@ -5,6 +5,7 @@ src/app.d
 src/gamewindow.d
 src/board.d
 src/aboutbox.d
+src/helpform.d
 src/config.d
 src/point.d
 src/color.d
