@@ -30,7 +30,7 @@ void about(GameWindow parent) {
         compiler, version_major, version_minor, os));
     about.setCopyright(format(
         "Copyright © %s Mark Summerfield. All rights reserved.", year));
-    about.setLicense("Free Open Source Software: Apache-2.0 License");
+    about.setLicense("Free Open Source Software: GPL-3.0 License");
     about.setWebsite("https://www.qtrac.eu/gravitate.html");
     about.setWebsiteLabel("www.qtrac.eu/gravitate.html");
     about.setTransientFor(parent);
