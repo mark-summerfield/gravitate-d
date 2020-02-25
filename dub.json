@@ -14,6 +14,7 @@
 			]
 		}
 	},
+    "stringImportPaths": ["."],
 	"dependencies": {
 		"gtk-d:gtkd": "~>3.9.0"
 	}

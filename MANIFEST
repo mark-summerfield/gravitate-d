@@ -8,7 +8,6 @@ src/config.d
 src/point.d
 src/color.d
 src/common.d
-src/icons.d
 
 README.md
 

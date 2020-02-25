@@ -3,16 +3,16 @@
 import gamewindow: GameWindow;
 
 void about(GameWindow parent) {
-    import common: APPNAME, VERSION;
-    import icons: ICON_XPM;
+    import common: APPNAME, ICON_XPM, VERSION;
+    import gdk.Pixbuf: Pixbuf;
+    import gdkpixbuf.c.types: GdkInterpType;
+    import gtk.AboutDialog: AboutDialog;
+    import gtk.Version: Version;
     import std.compiler: compiler = name, version_major, version_minor;
     import std.conv: to;
     import std.datetime.systime: Clock;
     import std.format: format;
     import std.system: os;
-    import gdk.Pixbuf: Pixbuf;
-    import gtk.AboutDialog: AboutDialog;
-    import gtk.Version: Version;
 
     auto thisYear = Clock.currTime.year;
     auto year = thisYear == 2020 ? thisYear.to!string
@@ -21,7 +21,9 @@ void about(GameWindow parent) {
     scope(exit) about.destroy;
     about.setProgramName(APPNAME);
     about.setVersion(VERSION);
-    about.setLogo(new Pixbuf(ICON_XPM));
+    auto icon = new Pixbuf(ICON_XPM).scaleSimple(64, 64,
+                                                 GdkInterpType.BILINEAR);
+    about.setLogo(icon);
     about.setAuthors(["Mark Summerfield"]);
     about.setComments(
         "A SameGame/TileFall-like game.\n\n" ~ format(

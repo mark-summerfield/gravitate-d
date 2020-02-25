@@ -22,9 +22,8 @@ final class GameWindow: ApplicationWindow {
     }
 
     this(Application application) {
-        import common: APPNAME;
+        import common: APPNAME, ICON_XPM;
         import gdk.Pixbuf: Pixbuf;
-        import icons: ICON_XPM;
 
         super(application);
         setTitle(APPNAME);
