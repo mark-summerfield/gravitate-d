@@ -23,9 +23,13 @@ Make sure `dub` can find GtkD by running:
 
 `dub add-path path/to/GtkD3`
 
-Then, in the directory you've cloned or unpacked Gravitate, run:
+Then, in the directory you've cloned or unpacked Gravitate, if using LDC
+run:
 
 `dub -brelease`
+
+(For other compilers either just run `dub` or lookup how to do a release
+build.)
 
 Then, move the gravitate executable to somewhere convenient.
 
