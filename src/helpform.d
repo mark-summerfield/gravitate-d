@@ -78,15 +78,12 @@ final class HelpForm: Window {
     }
 
     void makeLayout() {
-        import gtk.VPaned: VPaned;
         import gtk.ScrolledWindow: PolicyType, ScrolledWindow;
 
-        auto paned = new VPaned;
-        add(paned);
 		auto scroll = new ScrolledWindow(PolicyType.AUTOMATIC,
                                          PolicyType.AUTOMATIC);
 		scroll.add(view);
-		paned.add1(scroll);
+        add(scroll);
     }
 
     private bool onKeyPress(Event event, Widget) {
