@@ -1,5 +1,6 @@
 {
-	"name": "Gravitate",
+	"name": "gravitate",
+	"targetName": "Gravitate",
 	"authors": [ "Mark Summerfield" ],
 	"description": "A SameGame/TileFall-like game",
 	"copyright": "Copyright © 2020 Mark Summerfield. All rights reserved.",
