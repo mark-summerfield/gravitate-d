@@ -1,4 +1,5 @@
 // Copyright © 2020 Mark Summerfield. All rights reserved.
+module qtrac.gravitate.point;
 
 struct Point {
     private enum INVALID = -1;

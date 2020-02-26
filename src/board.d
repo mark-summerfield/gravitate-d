@@ -1,15 +1,16 @@
 // Copyright © 2020 Mark Summerfield. All rights reserved.
+module qtrac.gravitate.board;
 
 import gtk.DrawingArea: DrawingArea;
 
 final class Board: DrawingArea {
     import cairo.Context: Context, Scoped;
-    import color: Color;
-    import config: config;
     import gdk.Event: Event;
     import glib.c.types: GPriority;
     import gtk.Widget: Widget;
-    import point: Point;
+    import qtrac.gravitate.color: Color;
+    import qtrac.gravitate.config: config;
+    import qtrac.gravitate.point: Point;
     import std.container.rbtree: RedBlackTree;
     import std.typecons: Tuple;
 
@@ -39,7 +40,7 @@ final class Board: DrawingArea {
     }
 
     void newGame() {
-        import color: COLORS;
+        import qtrac.gravitate.color: COLORS;
         import std.algorithm: each;
         import std.array: array;
         import std.random: choice, randomSample;
@@ -109,7 +110,7 @@ final class Board: DrawingArea {
     }
 
     private Color.Pair colorPair(Color color) const {
-        import color: COLORS;
+        import qtrac.gravitate.color: COLORS;
 
         immutable plight = color in COLORS;
         Color light = plight is null ? Color.BACKGROUND : *plight;

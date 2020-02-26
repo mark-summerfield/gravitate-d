@@ -1,17 +1,18 @@
 // Copyright © 2020 Mark Summerfield. All rights reserved.
+module qtrac.gravitate.optionsform;
 
 import gtk.Window: Window;
 
 final class OptionsForm: Window {
-    import common: APPNAME;
-    import config: config, MIN_BOARD_SIZE, MAX_BOARD_SIZE, MIN_COLORS,
-           MIN_DELAY, MAX_DELAY;
     import gdk.Event: Event;
     import gtk.Button: Button;
     import gtk.Label: Label;
     import gtk.SpinButton: SpinButton;
     import gtk.ToolButton: ToolButton;
     import gtk.Widget: Widget;
+    import qtrac.gravitate.common: APPNAME;
+    import qtrac.gravitate.config: config, MIN_BOARD_SIZE, MAX_BOARD_SIZE,
+           MIN_COLORS, MIN_DELAY, MAX_DELAY;
 
     private {
         alias OnChangeBoardFn = void delegate(ToolButton);
@@ -41,8 +42,8 @@ final class OptionsForm: Window {
     }
 
     private void makeWidgets() {
-        import color: COLORS;
         import gtkc.gtktypes: StockID;
+        import qtrac.gravitate.color: COLORS;
 
         columnsLabel = new Label("Co_lumns");
         columnsSpinButton = new SpinButton(MIN_BOARD_SIZE, MAX_BOARD_SIZE,

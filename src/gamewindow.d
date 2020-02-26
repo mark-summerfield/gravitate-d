@@ -1,15 +1,16 @@
 // Copyright © 2020 Mark Summerfield. All rights reserved.
+module qtrac.gravitate.gamewindow;
 
 import gtk.ApplicationWindow: ApplicationWindow;
 
 final class GameWindow: ApplicationWindow {
-    import board: Board;
-    import config: config;
     import gdk.Event: Event;
     import gtk.Application: Application;
     import gtk.Label: Label;
     import gtk.ToolButton: ToolButton;
     import gtk.Widget: Widget;
+    import qtrac.gravitate.board: Board;
+    import qtrac.gravitate.config: config;
 
     private {
         ToolButton newButton;
@@ -22,8 +23,8 @@ final class GameWindow: ApplicationWindow {
     }
 
     this(Application application) {
-        import common: APPNAME, ICON_XPM;
         import gdk.Pixbuf: Pixbuf;
+        import qtrac.gravitate.common: APPNAME, ICON_XPM;
 
         super(application);
         setTitle(APPNAME);
@@ -139,17 +140,17 @@ final class GameWindow: ApplicationWindow {
     }
 
     private void onOptions(ToolButton) {
-        import optionsform: OptionsForm;
+        import qtrac.gravitate.optionsform: OptionsForm;
         new OptionsForm(&onNew, this);
     }
 
     private void onHelp(ToolButton) {
-        import helpform: HelpForm;
+        import qtrac.gravitate.helpform: HelpForm;
         new HelpForm(this);
     }
 
     private void onAbout(ToolButton) {
-        import aboutbox: about;
+        import qtrac.gravitate.aboutbox: about;
         about(this);
     }
 

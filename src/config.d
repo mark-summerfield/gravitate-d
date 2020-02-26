@@ -1,4 +1,5 @@
 // Copyright © 2020 Mark Summerfield. All rights reserved.
+module qtrac.gravitate.config;
 
 static Config config; // Must call config.load(applicationId) before use
 
@@ -17,7 +18,7 @@ private struct Config {
     int maxColors() const { return m.maxColors; }
 
     void maxColors(const int maxColors) {
-        import color: COLORS;
+        import qtrac.gravitate.color: COLORS;
         import std.conv: to;
 
         m.maxColors = clamp(maxColors, MIN_COLORS, COLORS.length.to!int);

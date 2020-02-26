@@ -40,6 +40,6 @@ GPLv3.txt
 *.cabal
 .dub/
 dub.selections.json
-gravitate
-gravitate.exe
+Gravitate
+Gravitate.exe
 images/

@@ -1,13 +1,14 @@
 // Copyright © 2020 Mark Summerfield. All rights reserved.
+module qtrac.gravitate.aboutbox;
 
-import gamewindow: GameWindow;
+import qtrac.gravitate.gamewindow: GameWindow;
 
 void about(GameWindow parent) {
-    import common: APPNAME, ICON_XPM, VERSION;
     import gdk.Pixbuf: Pixbuf;
     import gdkpixbuf.c.types: GdkInterpType;
     import gtk.AboutDialog: AboutDialog;
     import gtk.Version: Version;
+    import qtrac.gravitate.common: APPNAME, ICON_XPM, VERSION;
     import std.compiler: compiler = name, version_major, version_minor;
     import std.conv: to;
     import std.datetime.systime: Clock;

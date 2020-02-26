@@ -1,12 +1,13 @@
 // Copyright © 2020 Mark Summerfield. All rights reserved.
+module qtrac.gravitate.helpform;
 
 import gtk.Window: Window;
 
 final class HelpForm: Window {
-    import common: APPNAME;
     import gdk.Event: Event;
     import gtk.TextView: TextView;
     import gtk.Widget: Widget;
+    import qtrac.gravitate.common: APPNAME;
 
     private TextView view;
 
