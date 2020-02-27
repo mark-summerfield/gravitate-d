@@ -1,0 +1,12 @@
+The purpose of the game is to remove all the tiles.
+
+Click a tile that has at least one vertically or horizontally adjoining tile of the same color. This will remove the clicked tile and all the vertically and horizontally adjoining tiles of the same color, and their vertically and horizontally adjoining tiles, and so on. (So clicking a tile with no adjoining tiles of the same color does nothing.)
+
+The more tiles that are removed in one go, the higher the score.
+
+The game is over if any tile can't be removed (i.e., because there is no other tile of the same color).
+
+A winning game is where all the tiles are removed.
+
+Gravitate works like TileFall and the SameGame except that instead of tiles falling to the bottom and moving off to the left, they “gravitate” to the middle.
+

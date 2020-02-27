@@ -35,8 +35,12 @@ final class HelpForm: Window {
     void populateView() {
         import gtk.c.types: Justification;
         import gtk.TextIter: TextIter;
-        import pango.c.types: PANGO_SCALE, PangoWeight, PangoUnderline;
+        import pango.PgTabArray: PgTabArray;
+        import pango.c.types: PANGO_SCALE, PangoTabAlign, PangoWeight,
+               PangoUnderline;
 
+        auto tabs = new PgTabArray(1, true);
+        tabs.setTab(0, PangoTabAlign.LEFT, 80);
         auto buffer = view.getBuffer();
 		auto iter = new TextIter();
         buffer.getIterAtOffset(iter, 0);
@@ -49,13 +53,17 @@ final class HelpForm: Window {
                          "weight", PangoWeight.BOLD,
                          "size", 11 * PANGO_SCALE,
                          "foreground", "darkgreen",
-                         "underline", cast(int)PangoUnderline.SINGLE);
+                         "underline", cast(int)PangoUnderline.SINGLE,
+                         "tabs", tabs);
         buffer.createTag("key",
                          "weight", PangoWeight.BOLD,
+                         "size", 11 * PANGO_SCALE,
+                         "tabs", tabs);
+        buffer.createTag("desc",
                          "size", 11 * PANGO_SCALE);
         buffer.insertWithTagsByName(iter, "Gravitate\n\n", "title");
-        buffer.insert(iter, BODY);
-        buffer.insertWithTagsByName(iter, "Key — Action\n", "header");
+        buffer.insert(iter, import("data/help.txt"));
+        buffer.insertWithTagsByName(iter, "Key\tAction\n", "header");
 
         void insertKeyDesc(string key, string desc, string key2="") {
             buffer.insertWithTagsByName(iter, key, "key");
@@ -63,7 +71,7 @@ final class HelpForm: Window {
                 buffer.insert(iter, " or ");
                 buffer.insertWithTagsByName(iter, key2, "key");
             }
-            buffer.insert(iter, " — " ~ desc ~ "\n");
+            buffer.insertWithTagsByName(iter, "\t" ~ desc ~ "\n", "desc");
         }
         insertKeyDesc("a", "About");
         insertKeyDesc("h", "Help (this window)", "F1");
@@ -100,14 +108,3 @@ final class HelpForm: Window {
         return false;
     }
 }
-
-private auto BODY = q"EOT
-The purpose of the game is to remove all the tiles.
-
-Click a tile that has at least one vertically or horizontally adjoining tile of the same color to remove it and any vertically or horizontally adjoining tiles of the same color, and their vertically or horizontally adjoining tiles, and so on. (So clicking a tile with no adjoining tiles of the same color does nothing.)
-
-The more tiles that are removed in one go, the higher the score.
-
-Gravitate works like TileFall and the SameGame except that instead of tiles falling to the bottom and moving off to the left, they “gravitate” to the middle.
-
-EOT";

@@ -7,9 +7,12 @@ src/aboutbox.d
 src/config.d
 src/point.d
 src/color.d
-src/common.d
+src/common.d # VERSION
 
 README.md
+data/help.txt
 
 dub.json
 st.sh
+
+# vim: syn=yaml
