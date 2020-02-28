@@ -10,11 +10,12 @@ final class HelpForm: Window {
     import qtrac.gravitate.common: APPNAME;
 
     private TextView view;
+    private enum SIZE = 400;
 
     this(Window parent) {
         super("Help — " ~ APPNAME);
         setTransientFor(parent);
-        setDefaultSize(400, 400);
+        setDefaultSize(SIZE, SIZE);
         makeView();
         populateView();
         makeLayout();
@@ -40,7 +41,7 @@ final class HelpForm: Window {
                PangoUnderline;
 
         auto tabs = new PgTabArray(1, true);
-        tabs.setTab(0, PangoTabAlign.LEFT, 80);
+        tabs.setTab(0, PangoTabAlign.LEFT, SIZE / 5);
         auto buffer = view.getBuffer();
 		auto iter = new TextIter();
         buffer.getIterAtOffset(iter, 0);
