@@ -6,6 +6,5 @@ dscanner --styleCheck \
     | grep -v optionsform.d.*Variable.kv.is.never.modified \
     | grep -v gamewindow.d.*Variable.[ab].is.never.modified \
     | grep -v board.d.*Variable.event[XY].is.never.modified \
-    | grep -v helpform.d.*Line.is.longer.than.*characters \
-    | grep -v icons.d.*Line.is.longer.than.*characters
+    | grep -v helpform.d.*Line.is.longer.than.*characters
 git status
