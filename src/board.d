@@ -11,7 +11,6 @@ final class Board: DrawingArea {
     import qtrac.gravitate.color: Color;
     import qtrac.gravitate.config: config;
     import qtrac.gravitate.point: Point;
-    import std.container.rbtree: RedBlackTree;
     import std.typecons: Tuple;
 
     enum Direction { UP, DOWN, LEFT, RIGHT }
@@ -20,7 +19,9 @@ final class Board: DrawingArea {
     private {
         alias Size = Tuple!(int, "width", int, "height");
         alias OnChangeStateFn = void delegate(int, State);
-        alias PointSet = RedBlackTree!Point;
+        alias Unit = void[0];
+        enum unit = Unit.init;
+        alias PointSet = Unit[Point];
         alias PointMap = Point[Point];
         alias MovePoint = Tuple!(bool, "move", Point, "point");
 
@@ -240,10 +241,10 @@ final class Board: DrawingArea {
     private PointSet dimAdjoining(const Point p, const Color color) {
         import std.algorithm: each;
 
-        auto adjoining = new PointSet;
+        PointSet adjoining;
         populateAdjoining(p, color, adjoining);
         each!(ap => tiles[ap.x][ap.y] = tiles[ap.x][ap.y].darker)
-             (adjoining);
+             (adjoining.byKey);
         return adjoining;
     }
 
@@ -255,7 +256,7 @@ final class Board: DrawingArea {
             return; // Fallen off an edge
         if (p in adjoining || tiles[x][y] != color)
             return; // Color doesn't match or already done
-        adjoining.insert(p);
+        adjoining[p] = unit;
         populateAdjoining(Point(x - 1, y), color, adjoining);
         populateAdjoining(Point(x + 1, y), color, adjoining);
         populateAdjoining(Point(x, y - 1), color, adjoining);
@@ -268,7 +269,7 @@ final class Board: DrawingArea {
 
         queueDraw;
         immutable invalid = Color();
-        each!(ap => tiles[ap.x][ap.y] = invalid)(adjoining);
+        each!(ap => tiles[ap.x][ap.y] = invalid)(adjoining.byKey);
         new Timeout(config.delayMs, delegate bool() {
             closeTilesUp(adjoining.length); return false; },
             GPriority.HIGH, false);
@@ -319,6 +320,8 @@ final class Board: DrawingArea {
 
     private bool moveIsPossible(const int x, const int y,
                                 ref PointMap moves) {
+        import std.range: empty;
+
         immutable p = Point(x, y);
         auto empties = emptyNeighbours(x, y);
         if (!empties.empty) {
@@ -338,12 +341,12 @@ final class Board: DrawingArea {
     }
 
     private PointSet emptyNeighbours(const int x, const int y) {
-        auto neighbours = new PointSet;
+        PointSet neighbours;
         foreach (p; [Point(x - 1, y), Point(x + 1, y), Point(x, y - 1),
                      Point(x, y + 1)])
             if (0 <= p.x && p.x < config.columns && 0 <= p.y &&
                     p.y < config.rows && !tiles[p.x][p.y].isValid)
-                neighbours.insert(p);
+                neighbours[p] = unit;
         return neighbours;
     }
 
@@ -357,7 +360,7 @@ final class Board: DrawingArea {
         immutable oldRadius = hypot(midx - x, midy - y);
         double shortestRadius;
         Point rp;
-        foreach (p; empties) {
+        foreach (p; empties.byKey) {
             if (isSquare(p)) {
                 auto newRadius = hypot(midx - p.x, midy - p.y);
                 if (isLegal(p, color))
