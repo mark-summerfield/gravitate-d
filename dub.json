@@ -1,12 +1,7 @@
 {
-	"name": "gravitate",
-	"targetName": "Gravitate",
-	"authors": [ "Mark Summerfield" ],
-	"description": "A SameGame/TileFall-like game",
-	"copyright": "Copyright © 2020 Mark Summerfield. All rights reserved.",
-	"targetType": "executable",
-	"homepage": "https://www.qtrac.eu/gravitate.html",
-	"license": "GPL-3.0",
+	"authors": [
+		"Mark Summerfield"
+	],
 	"buildTypes": {
 		"release": {
 			"lflags-windows": [
@@ -15,8 +10,18 @@
 			]
 		}
 	},
-    "stringImportPaths": ["."],
+	"copyright": "Copyright © 2020 Mark Summerfield. All rights reserved.",
 	"dependencies": {
+		"aaset": "~>0.1.0",
 		"gtk-d:gtkd": "~>3.9.0"
-	}
+	},
+	"description": "A SameGame/TileFall-like game",
+	"homepage": "https://www.qtrac.eu/gravitate.html",
+	"license": "GPL-3.0",
+	"name": "gravitate",
+	"stringImportPaths": [
+		"."
+	],
+	"targetName": "Gravitate",
+	"targetType": "executable"
 }

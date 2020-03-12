@@ -4,6 +4,7 @@ module qtrac.gravitate.board;
 import gtk.DrawingArea: DrawingArea;
 
 final class Board: DrawingArea {
+    import aaset: AAset;
     import cairo.Context: Context, Scoped;
     import gdk.Event: Event;
     import glib.c.types: GPriority;
@@ -19,9 +20,7 @@ final class Board: DrawingArea {
     private {
         alias Size = Tuple!(int, "width", int, "height");
         alias OnChangeStateFn = void delegate(int, State);
-        alias Unit = void[0];
-        enum unit = Unit.init;
-        alias PointSet = Unit[Point];
+        alias PointSet = AAset!Point;
         alias PointMap = Point[Point];
         alias MovePoint = Tuple!(bool, "move", Point, "point");
 
@@ -244,7 +243,7 @@ final class Board: DrawingArea {
         PointSet adjoining;
         populateAdjoining(p, color, adjoining);
         each!(ap => tiles[ap.x][ap.y] = tiles[ap.x][ap.y].darker)
-             (adjoining.byKey);
+             (adjoining);
         return adjoining;
     }
 
@@ -256,7 +255,7 @@ final class Board: DrawingArea {
             return; // Fallen off an edge
         if (p in adjoining || tiles[x][y] != color)
             return; // Color doesn't match or already done
-        adjoining[p] = unit;
+        adjoining.add(p);
         populateAdjoining(Point(x - 1, y), color, adjoining);
         populateAdjoining(Point(x + 1, y), color, adjoining);
         populateAdjoining(Point(x, y - 1), color, adjoining);
@@ -269,7 +268,7 @@ final class Board: DrawingArea {
 
         queueDraw;
         immutable invalid = Color();
-        each!(ap => tiles[ap.x][ap.y] = invalid)(adjoining.byKey);
+        each!(ap => tiles[ap.x][ap.y] = invalid)(adjoining);
         new Timeout(config.delayMs, delegate bool() {
             closeTilesUp(adjoining.length); return false; },
             GPriority.HIGH, false);
@@ -346,7 +345,7 @@ final class Board: DrawingArea {
                      Point(x, y + 1)])
             if (0 <= p.x && p.x < config.columns && 0 <= p.y &&
                     p.y < config.rows && !tiles[p.x][p.y].isValid)
-                neighbours[p] = unit;
+                neighbours.add(p);
         return neighbours;
     }
 
@@ -360,7 +359,7 @@ final class Board: DrawingArea {
         immutable oldRadius = hypot(midx - x, midy - y);
         double shortestRadius;
         Point rp;
-        foreach (p; empties.byKey) {
+        foreach (p; empties) {
             if (isSquare(p)) {
                 auto newRadius = hypot(midx - p.x, midy - p.y);
                 if (isLegal(p, color))
