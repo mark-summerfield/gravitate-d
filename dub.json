@@ -12,7 +12,7 @@
 	},
 	"copyright": "Copyright © 2020 Mark Summerfield. All rights reserved.",
 	"dependencies": {
-		"aaset": "~>0.1.0",
+		"aaset": "~>0.1.2",
 		"gtk-d:gtkd": "~>3.9.0"
 	},
 	"description": "A SameGame/TileFall-like game",
