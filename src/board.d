@@ -319,8 +319,6 @@ final class Board: DrawingArea {
 
     private bool moveIsPossible(const int x, const int y,
                                 ref PointMap moves) {
-        import std.range: empty;
-
         immutable p = Point(x, y);
         auto empties = emptyNeighbours(x, y);
         if (!empties.empty) {
