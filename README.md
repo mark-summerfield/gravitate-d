@@ -2,11 +2,7 @@
 
 A SameGame/TileFall-like game written in D/GtkD.
 
-## Windows
-
-The file `gravitate-win64.zip` contains a 64-bit Windows binary and this
-`README.md` file.
-Just unzip it somewhere convenient and double-click `gravitate.exe` to run.
+![Screenshot](screenshot.png)
 
 ## Build
 
@@ -43,10 +39,14 @@ For versions in Nim/NiGui, Java/AWT/Swing, Python/Tkinter,
 Python/wxPython, and JavaScript see
 [www.qtrac.eu/gravitate.html](http://www.qtrac.eu/gravitate.html).
 
-## Notes
+## Windows
 
-This is my first D/GtkD program -- in fact my first Gtk program.
+I can only get it to run on Windows by installing the Gtk runtime, D, and
+GtkD as described in Build above.
 
-This version sometimes doesn't refresh after a click or press of the
-spacebar, in which case click or press again. I think this is due to me
-not fully understanding Gtk timers.
+Windows 10 "Defender" complains about installing the Gtk runtime with a
+scary message and only allowing you to install it by clicking "More Info"
+and then "Install Anyway".
+
+So, for Windows users just wanting an executable, the Nim `.zip` is
+easiest to use.
